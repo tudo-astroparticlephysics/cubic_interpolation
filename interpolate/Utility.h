@@ -22,29 +22,9 @@ public:
   template <typename T> float evaluate(T x) {
     auto node = std::array<size_t, T1::N>();
     for (size_t i = 0; i < T1::N; ++i) {
-      def.x_trafo[i]->transform(x[i]);
-      node[i] = def.x_trafo[i]->node(x[i]);
+      def.axis[i]->transform(x[i]);
+      node[i] = def.axis[i]->node(x[i]);
     }
     return inter.evaluate(node, x);
   }
 };
-
-/* template <> */
-/* template <> */
-/* float InterpolationUtility<Interpolant1d>::evaluate<float>(float x) { */
-/*   def.x_trafo[0]->transform(x); */
-/*   auto node = def.x_trafo[0]->node(x); */
-/*   return interpolant.evaluate(node, x); */
-/* } */
-
-/* template <typename T> */
-/* template <typename T1> */
-/* float InterpolationUtility<T>::evaluate(T1 x) { */
-/*   auto node = std::array<size_t, T::N>(); */
-
-/*   for (size_t i = 0; i < T::N; ++i) { */
-/*     def.x_trafo[i]->transform(x[i]); */
-/*     node[i] = def.x_trafo[i]->node(x[i]); */
-/*   } */
-/*   return interpolant.evaluate(node, x); */
-/* } */

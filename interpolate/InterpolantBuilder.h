@@ -15,11 +15,7 @@
 
 template <typename T1, typename T2 = typename T1::Definition,
           typename T3 = typename T1::Data>
-class InterpolantBuilder {
-  /* T2 def; */
-
-public:
-  /* InterpolantBuilder(T2 &&_def) : def(std::move(_def)){}; */
+struct InterpolantBuilder {
   InterpolantBuilder() = default;
 
   T1 build(T2 const &def, std::string save_path, std::string filename){};
@@ -64,15 +60,18 @@ InterpolantBuilder<BicubicSplines>::build(BicubicSplines::Definition const &def,
       throw ex;
   }
 
-  auto y = Eigen::MatrixXf(def.nodes[0], def.nodes[1]);
-  auto dydx1 = Eigen::MatrixXf(def.nodes[0], def.nodes[1]);
-  auto dydx2 = Eigen::MatrixXf(def.nodes[0], def.nodes[1]);
-  auto d2ydx1dx2 = Eigen::MatrixXf(def.nodes[0], def.nodes[1]);
+  auto x1nodes = def.axis[0]->required_nodes();
+  auto x2nodes = def.axis[1]->required_nodes();
 
-  for (size_t n1 = 0; n1 < def.nodes[0]; ++n1) {
-    for (size_t n2 = 0; n2 < def.nodes[1]; ++n2) {
-      auto x1 = def.x_trafo[0]->back_node(n1);
-      auto x2 = def.x_trafo[1]->back_node(n2);
+  auto y = Eigen::MatrixXf(x1nodes, x2nodes);
+  auto dydx1 = Eigen::MatrixXf(x1nodes, x2nodes);
+  auto dydx2 = Eigen::MatrixXf(x1nodes, x2nodes);
+  auto d2ydx1dx2 = Eigen::MatrixXf(x1nodes, x2nodes);
+
+  for (size_t n1 = 0; n1 < x1nodes; ++n1) {
+    for (size_t n2 = 0; n2 < x2nodes; ++n2) {
+      auto x1 = def.axis[0]->back_node(n1);
+      auto x2 = def.axis[1]->back_node(n2);
 
       y(n1, n2) = def.f(x1, x2);
       dydx1(n1, n2) = finite_difference_derivative(

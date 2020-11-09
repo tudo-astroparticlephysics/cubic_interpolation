@@ -37,8 +37,7 @@ public:
 struct BicubicSplines::Definition {
   std::function<float(float, float)> f;
   std::unique_ptr<Axis> f_trafo = nullptr;
-  std::array<std::unique_ptr<Axis>, N> x_trafo;
-  std::array<size_t, N> nodes;
+  std::array<std::unique_ptr<Axis>, N> axis;
 };
 
 class BicubicSplines::Data {

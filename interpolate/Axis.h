@@ -6,12 +6,17 @@
 class Axis {
 protected:
   float low;
+  float high;
   float stepsize;
 
   virtual void print(std::ostream &) const = 0;
 
 public:
-  Axis(float _low, float _stepsize) : low(_low), stepsize(_stepsize) {}
+  Axis(float _low, float _high) : low(_low), high(_high) {}
+  Axis(float _low, float _high, float _stepsize)
+      : low(_low), high(_high), stepsize(_stepsize) {}
+
+  virtual size_t required_nodes() const { return std::ceil((high - low) / stepsize); }
 
   virtual size_t node(float &x) {
     size_t n = std::floor((x - low) / stepsize);
@@ -19,14 +24,20 @@ public:
     return n;
   };
   virtual float back_node(size_t n) { return low + n * stepsize; };
-  virtual void transform(float &) noexcept = 0;
-  virtual void back_transform(float &) noexcept = 0;
+  virtual void transform(float &) noexcept {};
+  virtual void back_transform(float &) noexcept {};
 
   friend std::ostream &operator<<(std::ostream &out, const Axis &);
 };
 
 struct LogAxis : public Axis {
-  LogAxis(float _low, float _stepsize) : Axis(_low, _stepsize) {}
+  LogAxis(float _low, float _high, float _stepsize)
+      : Axis(_low, _high, _stepsize) {}
+  LogAxis(float _low, float _high, size_t _nodes) : Axis(_low, _high) {
+    transform(high);
+    transform(low);
+    stepsize = (high - low) / (_nodes - 1);
+  }
   inline void transform(float &x) noexcept final { x = std::log(x); }
   inline void back_transform(float &x) noexcept final { x = std::exp(x); }
 
@@ -35,7 +46,11 @@ protected:
 };
 
 struct LinAxis : public Axis {
-  LinAxis(float _low, float _stepsize) : Axis(_low, _stepsize) {}
+  LinAxis(float _low, float _high, size_t _nodes) : Axis(_low, _high) {
+    stepsize = (high - low) / (_nodes - 1);
+  }
+  LinAxis(float _low, float _high, float _stepsize)
+      : Axis(_low, _high, _stepsize) {}
   inline void transform(float &) noexcept final { return; }
   inline void back_transform(float &) noexcept final { return; }
 
@@ -49,9 +64,11 @@ std::ostream &operator<<(std::ostream &out, const Axis &axis) {
 }
 
 void LogAxis::print(std::ostream &os) const {
-  os << "LogAxis(low: " << low << ", stepsize: " << stepsize << ")";
+  os << "LogAxis(low: " << low << ", high: " << high
+     << ", stepsize: " << stepsize << ")";
 }
 
 void LinAxis::print(std::ostream &os) const {
-  os << "LinAxis(low: " << low << ", stepsize: " << stepsize << ")";
+  os << "LinAxis(low: " << low << ", high: " << high
+     << ", stepsize: " << stepsize << ")";
 }
