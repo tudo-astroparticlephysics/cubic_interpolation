@@ -1,10 +1,11 @@
-message(STATUS "Finding Eigen3")
+message(CHECK_START "Searching Eigen3")
 find_package(Eigen3 3.3 NO_MODULE)
 
 if (Eigen3_FOUND)
-    message(STATUS "found in: ${EIGEN3_ROOT_DIR}")
+    message(STATUS "  found includes in: ${EIGEN3_INCLUDE_DIRS}")
+    message(CHECK_PASS "done.")
 else()
-    message(STATUS "No Eigen3 installation found.")
+    message(CHECK_FAIL "No Eigen3 installation found.")
     include(FetchContent)
     FetchContent_Declare(
       Eigen3
@@ -13,11 +14,19 @@ else()
       GIT_PROGRESS TRUE
     )
 
-    FetchContent_GetProperties(Eigen3)
-    if(NOT eigen3_POPULATED)
-      message(STATUS "Fetching Eigen3 master.")
-      FetchContent_Populate(eigen3)
+    FetchContent_MakeAvailable(Eigen3)
+endif()
 
-      add_subdirectory(${eigen3_SOURCE_DIR} ${eigen3_BINARY_DIR})
-    endif()
-endif ()
+
+message(CHECK_START "Searching Boost")
+find_package(Boost 1.56 QUIET COMPONENTS
+    serialization)
+if(Boost_FOUND)
+    message(STATUS "  found includes in: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "  found includes in: ${Boost_LIBRARY_DIRS}")
+    message(CHECK_PASS "done.")
+else()
+    message(STATUS "No BOOST installation found.")
+endif()
+
+message(STATUS "done.")

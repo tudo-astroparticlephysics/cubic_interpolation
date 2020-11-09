@@ -13,13 +13,13 @@ target_sources(INTERPOLATE INTERFACE
     )
 
 find_package(Eigen3)
-find_package(Boost 1.74.0 COMPONENTS boost_serialization)
+find_package(Boost QUIET COMPONENTS serialization)
 
 target_link_libraries (
   INTERPOLATE
   INTERFACE
   Eigen3::Eigen
-  boost_serialization
+  Boost::serialization
   )
 
 install(TARGETS INTERPOLATE
