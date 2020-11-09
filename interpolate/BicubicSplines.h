@@ -87,7 +87,7 @@ class BicubicSplinesData {
   // & operator is defined similar to <<.  Likewise, when the class Archive
   // is a type of input archive the & operator is defined similar to >>.
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
+  void serialize(Archive &ar, const unsigned int) {
     ar &size;
     ar &y;
     ar &dydx1;
@@ -99,7 +99,7 @@ public:
   BicubicSplinesData() = default;
   BicubicSplinesData(Eigen::MatrixXf _y, Eigen::MatrixXf _dydx1,
                      Eigen::MatrixXf _dydx2, Eigen::MatrixXf _d2ydx1dx2)
-      : size({_y.rows(), _y.cols()}),
+      : size({(size_t)_y.rows(), (size_t)_y.cols()}),
         y(std::vector<float>(_y.data(), _y.data() + size[0] * size[1])),
         dydx1(std::vector<float>(_dydx1.data(),
                                  _dydx1.data() + size[0] * size[1])),

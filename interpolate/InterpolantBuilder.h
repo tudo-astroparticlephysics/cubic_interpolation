@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <system_error>
 #include <tuple>
@@ -28,12 +29,15 @@ public:
   };
 };
 
-static std::string SAVE_PATH = "/home/msackel/.local/include/PROPOSAL/tables/";
+static std::string SAVE_PATH = "~/.local/share/PROPOSAL/tables/";
 
 template <>
 BicubicSplines InterpolantBuilder<BicubicSplines>::load(std::string path,
                                                         size_t hash) {
-  std::ifstream ifs(SAVE_PATH + "test");
+
+  std::stringstream ss;
+  ss << path << hash << ".txt";
+  std::ifstream ifs(ss.str());
   if (!ifs.is_open()) {
     throw std::system_error(ENOENT, std::generic_category(),
                             "Interpolation tables couldn't be found.");
@@ -52,9 +56,11 @@ bool InterpolantBuilder<BicubicSplines>::save(std::string path, size_t hash,
                                               Eigen::MatrixXf dydx1,
                                               Eigen::MatrixXf dydx2,
                                               Eigen::MatrixXf d2ydx1dx2) {
-  auto data = BicubicSplinesData(y, dydx1, dydx2, d2ydx1dx2);
-  std::ofstream ofs(SAVE_PATH + "test");
+  std::stringstream ss;
+  ss << path << hash << ".txt";
+  std::ofstream ofs(ss.str());
   boost::archive::text_oarchive oa(ofs);
+  auto data = BicubicSplinesData(y, dydx1, dydx2, d2ydx1dx2);
   oa << data;
   return true;
 }
@@ -63,7 +69,7 @@ template <> BicubicSplines InterpolantBuilder<BicubicSplines>::build() {
   using boost::math::differentiation::finite_difference_derivative;
 
   try {
-    return load(SAVE_PATH, 0);
+    return load(SAVE_PATH, 42);
   } catch (std::system_error const &ex) {
     if (ex.code().value() != ENOENT)
       throw ex;
@@ -93,7 +99,7 @@ template <> BicubicSplines InterpolantBuilder<BicubicSplines>::build() {
     }
   }
 
-  bool sucess = save(SAVE_PATH, 0, y, dydx1, dydx2, d2ydx1dx2);
+  bool sucess = save(SAVE_PATH, 42, y, dydx1, dydx2, d2ydx1dx2);
   if (not sucess)
     std::cout << "storage of tables have failed" << std::endl;
 
