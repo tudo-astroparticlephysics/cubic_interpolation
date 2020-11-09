@@ -2,6 +2,8 @@
 
 #include <Eigen/Dense>
 #include <boost/math/differentiation/finite_difference.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/vector.hpp>
 #include <cassert>
 #include <functional>
 
@@ -12,33 +14,61 @@ class BicubicSplines {
   const Eigen::Matrix4f m;
   const Eigen::Matrix4f m_t;
 
-  Eigen::MatrixXf y;
-  Eigen::MatrixXf dydx1;
-  Eigen::MatrixXf dydx2;
-  Eigen::MatrixXf d2ydx1dx2;
+  using matrix_t = Eigen::MatrixXf;
+  matrix_t y;
+  matrix_t dydx1;
+  matrix_t dydx2;
+  matrix_t d2ydx1dx2;
 
 public:
   BicubicSplines() = default;
-  BicubicSplines(Eigen::Ref<Eigen::MatrixXf>, Eigen::Ref<Eigen::MatrixXf>,
-                 Eigen::Ref<Eigen::MatrixXf>, Eigen::Ref<Eigen::MatrixXf>);
+  BicubicSplines(Eigen::Ref<matrix_t>, Eigen::Ref<matrix_t>,
+                 Eigen::Ref<matrix_t>, Eigen::Ref<matrix_t>);
 
   static constexpr size_t N = 2;
 
-  struct Definition {
-    std::function<float(float, float)> f;
-    std::unique_ptr<Axis> f_trafo = nullptr;
-    std::array<std::unique_ptr<Axis>, N> x_trafo;
-    std::array<size_t, N> nodes;
-    size_t hash;
-  };
+  struct Definition;
+
+  struct Data;
 
   template <typename T, typename Y> float evaluate(T node, Y x);
 };
 
-BicubicSplines::BicubicSplines(Eigen::Ref<Eigen::MatrixXf> _y,
-                               Eigen::Ref<Eigen::MatrixXf> _dydx1,
-                               Eigen::Ref<Eigen::MatrixXf> _dydx2,
-                               Eigen::Ref<Eigen::MatrixXf> _d2ydx1dx2)
+struct BicubicSplines::Definition {
+  std::function<float(float, float)> f;
+  std::unique_ptr<Axis> f_trafo = nullptr;
+  std::array<std::unique_ptr<Axis>, N> x_trafo;
+  std::array<size_t, N> nodes;
+};
+
+class BicubicSplines::Data {
+
+  std::array<size_t, 2> size;
+  std::vector<float> y;
+  std::vector<float> dydx1;
+  std::vector<float> dydx2;
+  std::vector<float> d2ydx1dx2;
+
+  friend class boost::serialization::access;
+  template <class Archive> void serialize(Archive &ar, const unsigned int) {
+    ar &size;
+    ar &y;
+    ar &dydx1;
+    ar &dydx2;
+    ar &d2ydx1dx2;
+  }
+
+public:
+  Data() = default;
+  Data(matrix_t _y, matrix_t _dydx1, matrix_t _dydx2, matrix_t _d2ydx1dx2);
+
+  BicubicSplines build();
+};
+
+BicubicSplines::BicubicSplines(Eigen::Ref<matrix_t> _y,
+                               Eigen::Ref<matrix_t> _dydx1,
+                               Eigen::Ref<matrix_t> _dydx2,
+                               Eigen::Ref<matrix_t> _d2ydx1dx2)
     : m((Eigen::Matrix4f() << 1, 0, -3, 2, 0, 0, 3, -2, 0, 1, -2, 1, 0, 0, -1,
          1)
             .finished()),
@@ -51,14 +81,13 @@ float BicubicSplines::evaluate(T1 node, T2 x) {
   assert(2 == x.size());
 
   Eigen::Matrix4f temp(4, 4);
-  Eigen::Vector4f x1(4);
-  Eigen::Vector4f x2(4);
-
   temp.block<2, 2>(0, 0) = y.block(node[0], node[1], 2, 2);
   temp.block<2, 2>(2, 0) = dydx1.block(node[0], node[1], 2, 2);
   temp.block<2, 2>(0, 2) = dydx2.block(node[0], node[1], 2, 2);
   temp.block<2, 2>(2, 2) = d2ydx1dx2.block(node[0], node[1], 2, 2);
 
+  Eigen::Vector4f x1(4);
+  Eigen::Vector4f x2(4);
   for (size_t i = 0; i < 4; ++i) {
     x1(i) = 1;
     x2(i) = 1;
@@ -71,49 +100,21 @@ float BicubicSplines::evaluate(T1 node, T2 x) {
   return x1.dot((m_t * (temp * m)) * x2);
 }
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/vector.hpp>
-class BicubicSplinesData {
-  std::array<size_t, 2> size;
-  std::vector<float> y;
-  std::vector<float> dydx1;
-  std::vector<float> dydx2;
-  std::vector<float> d2ydx1dx2;
+BicubicSplines::Data::Data(matrix_t _y, matrix_t _dydx1, matrix_t _dydx2,
+                           matrix_t _d2ydx1dx2)
+    : size({(size_t)_y.rows(), (size_t)_y.cols()}),
+      y(std::vector<float>(_y.data(), _y.data() + size[0] * size[1])),
+      dydx1(
+          std::vector<float>(_dydx1.data(), _dydx1.data() + size[0] * size[1])),
+      dydx2(
+          std::vector<float>(_dydx2.data(), _dydx2.data() + size[0] * size[1])),
+      d2ydx1dx2(std::vector<float>(_d2ydx1dx2.data(),
+                                   _d2ydx1dx2.data() + size[0] * size[1])){};
 
-  friend class boost::serialization::access;
-  // When the class Archive corresponds to an output archive, the
-  // & operator is defined similar to <<.  Likewise, when the class Archive
-  // is a type of input archive the & operator is defined similar to >>.
-  template <class Archive>
-  void serialize(Archive &ar, const unsigned int) {
-    ar &size;
-    ar &y;
-    ar &dydx1;
-    ar &dydx2;
-    ar &d2ydx1dx2;
-  }
-
-public:
-  BicubicSplinesData() = default;
-  BicubicSplinesData(Eigen::MatrixXf _y, Eigen::MatrixXf _dydx1,
-                     Eigen::MatrixXf _dydx2, Eigen::MatrixXf _d2ydx1dx2)
-      : size({(size_t)_y.rows(), (size_t)_y.cols()}),
-        y(std::vector<float>(_y.data(), _y.data() + size[0] * size[1])),
-        dydx1(std::vector<float>(_dydx1.data(),
-                                 _dydx1.data() + size[0] * size[1])),
-        dydx2(std::vector<float>(_dydx2.data(),
-                                 _dydx2.data() + size[0] * size[1])),
-        d2ydx1dx2(std::vector<float>(_d2ydx1dx2.data(),
-                                     _d2ydx1dx2.data() + size[0] * size[1])){};
-
-  BicubicSplines build() {
-    using Eigen::Map;
-    using matrix_t = Eigen::MatrixXf;
-    return BicubicSplines(Map<matrix_t>(y.data(), size[0], size[1]),
-                          Map<matrix_t>(dydx1.data(), size[0], size[1]),
-                          Map<matrix_t>(dydx2.data(), size[0], size[1]),
-                          Map<matrix_t>(d2ydx1dx2.data(), size[0], size[1]));
-  };
+BicubicSplines BicubicSplines::Data::build() {
+  using Eigen::Map;
+  return BicubicSplines(Map<matrix_t>(y.data(), size[0], size[1]),
+                        Map<matrix_t>(dydx1.data(), size[0], size[1]),
+                        Map<matrix_t>(dydx2.data(), size[0], size[1]),
+                        Map<matrix_t>(d2ydx1dx2.data(), size[0], size[1]));
 };
