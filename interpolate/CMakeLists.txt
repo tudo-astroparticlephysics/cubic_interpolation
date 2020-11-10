@@ -1,29 +1,25 @@
 add_library(INTERPOLATE INTERFACE)
 
+find_package(Eigen3 3.3 QUIET REQUIRED NO_MODULE)
+find_package(Boost 1.58.0 QUIET REQUIRED serialization)
+
 target_include_directories(INTERPOLATE INTERFACE
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-
-target_sources(INTERPOLATE INTERFACE
-    BicubicSplines.h
-    Utility.h
-    Axis.h
-    InterpolantBuilder.h
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    ${Boost_INCLUDE_DIRS}
     )
 
-find_package(Eigen3)
-find_package(Boost QUIET COMPONENTS serialization)
-
 target_link_libraries (
-  INTERPOLATE
-  INTERFACE
-  Eigen3::Eigen
-  Boost::serialization
-  )
+    INTERPOLATE
+    INTERFACE
+    Eigen3::Eigen
+    ${Boost_LIBRARIES}
+    )
+
 
 install(TARGETS INTERPOLATE
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+    )

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Eigen/Dense>
 #include <cerrno>
 #include <fstream>
 #include <iostream>

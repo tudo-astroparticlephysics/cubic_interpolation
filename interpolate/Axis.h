@@ -16,7 +16,9 @@ public:
   Axis(float _low, float _high, float _stepsize)
       : low(_low), high(_high), stepsize(_stepsize) {}
 
-  virtual size_t required_nodes() const { return std::ceil((high - low) / stepsize); }
+  virtual size_t required_nodes() const {
+    return std::ceil((high - low) / stepsize) + 1;
+  }
 
   virtual size_t node(float &x) {
     size_t n = std::floor((x - low) / stepsize);
