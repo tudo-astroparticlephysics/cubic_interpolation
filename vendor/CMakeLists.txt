@@ -1,14 +1,15 @@
-# SET(FETCHCONTENT_QUIET FALSE)
 include(FetchContent)
+
+set(BUILD_TESTING OFF)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "release")
+endif()
+
 
 message(CHECK_START "Searching Eigen3")
 find_package (Eigen3 3.3 NO_MODULE)
-
-if (Eigen3_FOUND)
-    message(STATUS "  found includes in: ${EIGEN3_INCLUDE_DIRS}")
-    message(CHECK_PASS "done.")
-else()
-    message(CHECK_FAIL "No Eigen3 found.")
+if (NOT Eigen3_FOUND)
+    message(STATUS "  No Eigen3 found.")
     message(STATUS "  Fetching Eigen3. This may take a while.")
     FetchContent_Declare(
         Eigen3
@@ -18,17 +19,17 @@ else()
         )
     FetchContent_MakeAvailable(Eigen3)
 endif()
+message(STATUS "  found includes in: ${EIGEN3_INCLUDE_DIRS}")
+message(CHECK_PASS "done.")
+
+
 
 set(BOOST_LIBS serialization)
 
+
 message(CHECK_START "Searching boost")
-find_package(Boost 1.58.0 QUIET COMPONENTS ${BOOST_LIBS})
-if(Boost_FOUND)
-    message(STATUS "  found includes in: ${boost_INCLUDE_DIRS}")
-    message(STATUS "  found includes in: ${boost_LIBRARY_DIRS}")
-    message(CHECK_PASS "done.")
-else()
-    message(CHECK_FAIL "No boost found.")
+find_package(Boost 1.58.0 COMPONENTS ${BOOST_LIBS})
+if(NOT Boost_FOUND)
     FetchContent_Declare(
         boost
         URL https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
@@ -36,18 +37,14 @@ else()
         )
     FetchContent_GetProperties(boost)
     if(NOT boost_POPULATED)
+        message(STATUS "  No boost found.")
         message(STATUS "  Fetching Boost. This may take a while.")
         FetchContent_Populate(boost)
 
         option(ENABLE_BOOST_BUILD "Enable reconfiguring and rerunning the boost build" ON)
         if(ENABLE_BOOST_BUILD)
 
-            # This file comes from the following location:
-            #   https://github.com/pfultz2/cget/blob/master/cget/cmake/boost.cmake
-            configure_file(boost.cmake
-                ${boost_SOURCE_DIR}/CMakeLists.txt
-                COPYONLY
-                )
+            configure_file(boost.cmake ${boost_SOURCE_DIR}/CMakeLists.txt COPYONLY)
 
             unset(generatorArgs)
             set(cacheArgs
@@ -106,6 +103,8 @@ else()
         endif()
         set(CMAKE_PREFIX_PATH ${boost_BINARY_DIR}/install)
     endif()
+    find_package(Boost 1.58.0 CONFIG REQUIRED ${BOOST_LIBS})
 endif()
-find_package(Boost 1.74.0 COMPONENTS ${BOOST_LIBS})
-message(STATUS "done.")
+message(STATUS "  found includes in: ${Boost_INCLUDE_DIRS}")
+message(STATUS "  found includes in: ${Boost_LIBRARY_DIRS}")
+message(CHECK_PASS "done.")

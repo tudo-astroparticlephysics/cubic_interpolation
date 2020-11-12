@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.18.4)
 
 project(test LANGUAGES CXX)
 
@@ -8,6 +8,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+
+set(Boost_USE_DEBUG_RUNTIME OFF)
+set(Boost_USE_STATIC_RUNTIME ON)
+set(Boost_USE_DEBUG_LIBS OFF)
+set(Boost_USE_STATIC_LIBS ON)
 
 add_subdirectory(vendor)
 add_subdirectory(interpolate)
