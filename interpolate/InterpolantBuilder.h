@@ -24,7 +24,6 @@ struct InterpolantBuilder {
   T1 load(std::string path, std::string filename) {
     std::ifstream ifs(path + filename);
     if (!ifs.is_open()) {
-      ifs.close();
       throw std::system_error(ENOENT, std::generic_category(),
                               "Interpolation tables couldn't be found.");
     }
