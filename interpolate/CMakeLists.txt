@@ -14,7 +14,8 @@ target_link_libraries (
     INTERPOLATE
     INTERFACE
     Eigen3::Eigen
-    ${Boost_LIBRARIES}
+    Boost::serialization
+    # ${BOOST_LIBS}
     )
 
 

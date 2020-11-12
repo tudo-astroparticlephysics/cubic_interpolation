@@ -13,8 +13,13 @@ set(Boost_USE_DEBUG_RUNTIME OFF)
 set(Boost_USE_STATIC_RUNTIME ON)
 set(Boost_USE_DEBUG_LIBS OFF)
 set(Boost_USE_STATIC_LIBS ON)
+# Project wide setup
 
-add_subdirectory(vendor)
+set(BOOST_LIBS serialization)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(eigen)
+include(boost)
+
 add_subdirectory(interpolate)
 
 add_executable(test example.cxx)
