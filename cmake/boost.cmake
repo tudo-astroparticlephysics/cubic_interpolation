@@ -1,4 +1,3 @@
-
 include(FetchContent)
 message(CHECK_START "Searching boost")
 
@@ -27,16 +26,17 @@ execute_process(
     COMMAND ${boost_SOURCE_DIR}/bootstrap.sh ${CMAKE_CXX_COMPILER_NAME}
     WORKING_DIRECTORY ${boost_SOURCE_DIR}
     )
-set(b2 "${boost_SOURCE_DIR}/b2")
 
 set(CMAKE_CXX_COMPILER_NAME:STRING="NotFound")
 if (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
     set(CMAKE_CXX_COMPILER_NAME "clang")
+    string(APPEND CMAKE_CXX_FLAGS " --gcc-toolchain")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_COMPILER_NAME "gcc")
 else ()
     message( SEND_ERROR "Compiler is not supported." )
 endif()
+
 
 set(BUILD_FLAGS "")
 
@@ -49,6 +49,9 @@ execute_process(
     WORKING_DIRECTORY ${boost_SOURCE_DIR}
     )
 
-set(BOOST_ROOT ${boost_BINARY_DIR} CACHE PATH)
-set(BOOST_INCLUDEDIR ${boost_BINARY_DIR}/include CACHE PATH)
-set(BOOST_LIBRARYDIR ${boost_BINARY_DIR}/lib CACHE PATH)
+set(BOOST_ROOT ${boost_BINARY_DIR} CACHE
+    PATH "Preferred Boost installation prefix")
+set(BOOST_INCLUDEDIR ${boost_BINARY_DIR}/include CACHE
+    PATH "Preferred Boost include directory")
+set(BOOST_LIBRARYDIR ${boost_BINARY_DIR}/lib CACHE
+    PATH "Preferred Boost library directory ")

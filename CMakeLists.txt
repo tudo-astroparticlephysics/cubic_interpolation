@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.4)
+cmake_minimum_required(VERSION 3.14.3)
 
 project(test LANGUAGES CXX)
 
@@ -13,11 +13,13 @@ set(Boost_USE_DEBUG_RUNTIME OFF)
 set(Boost_USE_STATIC_RUNTIME ON)
 set(Boost_USE_DEBUG_LIBS OFF)
 set(Boost_USE_STATIC_LIBS ON)
-# Project wide setup
+set(Boost_DETAILED_FAILURE_MSG OFF)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+include(eigen)
 
 set(BOOST_LIBS serialization)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-include(eigen)
 include(boost)
 
 add_subdirectory(interpolate)
