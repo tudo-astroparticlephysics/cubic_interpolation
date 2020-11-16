@@ -23,11 +23,13 @@ public:
   virtual size_t node(float &x) {
     size_t n = std::floor((x - low) / stepsize);
     x -= low + n * stepsize;
+    x *= 1 / stepsize;
     return n;
-  };
-  virtual float back_node(size_t n) { return low + n * stepsize; };
-  virtual void transform(float &) noexcept {};
-  virtual void back_transform(float &) noexcept {};
+  }
+
+  virtual float back_node(size_t n) { return low + n * stepsize; }
+  virtual float transform(float x) const noexcept { return x; }
+  virtual float back_transform(float x) const noexcept { return x; }
 
   friend std::ostream &operator<<(std::ostream &out, const Axis &);
 };
@@ -40,8 +42,10 @@ struct LogAxis : public Axis {
     transform(low);
     stepsize = (high - low) / (_nodes - 1);
   }
-  inline void transform(float &x) noexcept final { x = std::log(x); }
-  inline void back_transform(float &x) noexcept final { x = std::exp(x); }
+  inline float transform(float x) const noexcept final { return std::log(x); }
+  inline float back_transform(float x) const noexcept final {
+    return std::exp(x);
+  }
 
 protected:
   void print(std::ostream &) const;
@@ -53,8 +57,8 @@ struct LinAxis : public Axis {
   }
   LinAxis(float _low, float _high, float _stepsize)
       : Axis(_low, _high, _stepsize) {}
-  inline void transform(float &) noexcept final { return; }
-  inline void back_transform(float &) noexcept final { return; }
+  inline float transform(float x) const noexcept final { return x; }
+  inline float back_transform(float x) const noexcept final { return x; }
 
 protected:
   void print(std::ostream &) const;

@@ -1,52 +1,36 @@
-#include <BicubicSplines.h>
-#include <Utility.h>
 #include <array>
-#include <chrono>
+#include <cstdlib>
 #include <iostream>
-#include <random>
+#include <memory>
+
+#include "BicubicSplines.h"
+#include "Utility.h"
 
 float func(float x_1, float x_2) { return x_1 * x_1 + x_2 * x_2 + x_1 * x_2; }
 
 int main(int argc, char *argv[]) {
-  constexpr size_t size = 11;
-
-  auto low = std::array<float, 2>{-1, -1};
-  auto high = std::array<float, 2>{1, 1};
-  auto step_size = std::array<float, 2>{(high[0] - low[0]) / (size - 1),
-                                        (high[0] - low[0]) / (size - 1)};
+  if (argc != 3) {
+    std::cout << "Usage: 1dim_example POINT_1 POINT_2\n"
+              << "\n"
+              << "  POINT_1     first variable to evaluate the function\n"
+              << "  POINT_2     second variable to evaluate the function\n"
+              << std::endl;
+    return 0;
+  }
 
   auto def = BicubicSplines::Definition();
   def.f = func;
-  def.axis[0] = std::make_unique<LinAxis>(low[0], high[0], size);
-  def.axis[1] = std::make_unique<LinAxis>(low[1], high[1], size);
+  def.axis[0] = std::make_unique<LinAxis>(-1, 1, (size_t)11);
+  def.axis[1] = std::make_unique<LinAxis>(-1, 1, (size_t)11);
 
-  auto inter = Interpolant<BicubicSplines>(
-      std::move(def), "/home/msackel/.local/share/PROPOSAL/", "42.txt");
+  auto path = "/home/msackel/.local/share/PROPOSAL/";
+  auto tablename = "42.txt";
+  auto inter = Interpolant<BicubicSplines>(std::move(def), path, tablename);
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> dis(-1.0, 1.0);
+  auto point = std::array<float, 2>{std::atof(argv[1]), std::atof(argv[2])};
+  auto res = inter.evaluate(point);
 
-  auto res = 0.f;
-  auto point = std::array<float, 2>();
-  auto start = std::chrono::high_resolution_clock::now();
-  for (size_t i = 0; i < 1'000; ++i) {
-    point[0] = dis(gen);
-    point[1] = dis(gen);
-
-    res = inter.evaluate(point);
-  }
-  auto stop = std::chrono::high_resolution_clock::now();
-
-  std::cout << point[0] << " * " << point[0] << " + " << point[1] << " * "
-            << point[1] << " + " << point[0] << " * " << point[1] << " = "
-            << res << std::endl;
-
-  std::cout << "cubic splien interpolation takes "
-            << std::chrono::duration_cast<std::chrono::microseconds>(stop -
-                                                                     start)
-                   .count()
-            << " micro seconds" << std::endl;
-
+  std::cout << "f(" << point[0] << ", " << point[1] << "): " << res
+            << std::endl;
   return 0;
 }

@@ -1,43 +1,33 @@
-#include <CubicSplines.h>
-#include <Utility.h>
-#include <array>
-#include <chrono>
+#include <cstdlib>
 #include <iostream>
-#include <random>
+#include <memory>
+
+#include "CubicSplines.h"
+#include "Utility.h"
 
 float func(float x) { return x * x + x; }
 
 int main(int argc, char *argv[]) {
+  if (argc != 2) {
+    std::cout << "Usage: 1dim_example POINT\n"
+              << "\n"
+              << "  POINT     point to evaluate the function\n"
+              << std::endl;
+    return 0;
+  }
 
   auto def = CubicSplines::Definition();
   def.f = func;
-  def.axis = std::make_unique<LinAxis>(-1.f, 1.f, (size_t)101);
+  def.axis = std::make_unique<LinAxis>(-4.f, 4.f, (size_t)20);
 
-  auto inter = Interpolant<CubicSplines>(
-      std::move(def), "/home/msackel/.local/share/PROPOSAL/", "43.txt");
+  auto path = "/home/msackel/.local/share/PROPOSAL/";
+  auto tablename = "43.txt";
+  auto inter = Interpolant<CubicSplines>(std::move(def), path, tablename);
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> dis(-1.0, 1.0);
+  auto point = std::atof(argv[1]);
+  auto res = inter.evaluate(point);
 
-  auto res = 0.f;
-  auto point = 0.f;
-  auto start = std::chrono::high_resolution_clock::now();
-  for (size_t i = 0; i < 1; ++i) {
-    point = dis(gen);
-
-    res = inter.evaluate(point);
-  }
-  auto stop = std::chrono::high_resolution_clock::now();
-
-  std::cout << point << " * " << point << " + " << point << "= " << res
-            << std::endl;
-
-  std::cout << "cubic splien interpolation takes "
-            << std::chrono::duration_cast<std::chrono::microseconds>(stop -
-                                                                     start)
-                   .count()
-            << " micro seconds" << std::endl;
+  std::cout << "f(" << point << "): " << res << std::endl;
 
   return 0;
 }

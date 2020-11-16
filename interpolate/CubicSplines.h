@@ -2,7 +2,6 @@
 
 #include <boost/math/interpolators/cardinal_cubic_b_spline.hpp>
 #include <boost/serialization/access.hpp>
-#include <cmath>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -15,7 +14,8 @@ class CubicSplines {
 public:
   CubicSplines() = default;
 
-  template <typename T> CubicSplines(T val);
+  template <typename T>
+  CubicSplines(T val) : spline(val.data(), val.size(), 0, 1) {}
 
   static constexpr size_t N = 1;
 
@@ -23,7 +23,7 @@ public:
 
   struct Data;
 
-  float evaluate(int node, float x);
+  float evaluate(int node, float x) { return spline(x + node); };
 };
 
 struct CubicSplines::Definition {
@@ -43,17 +43,7 @@ class CubicSplines::Data {
 public:
   Data() = default;
 
-  template <typename T>
-  Data(T&& _y) : y(std::forward<T>(_y)) {};
+  template <typename T> Data(T &&_y) : y(std::forward<T>(_y)){};
 
-  CubicSplines build();
+  CubicSplines build() { return CubicSplines(y); };
 };
-
-template <typename T>
-CubicSplines::CubicSplines(T val) : spline(val.data(), val.size(), 0, 1) {}
-
-float CubicSplines::evaluate(int node, float x) { return spline(x + node); }
-
-CubicSplines CubicSplines::Data::build() {
-    return CubicSplines(y);
-}

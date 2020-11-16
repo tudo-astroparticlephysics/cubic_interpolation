@@ -2,12 +2,11 @@
 
 #include "Axis.h"
 #include "InterpolantBuilder.h"
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <memory>
-#include <tuple>
 #include <type_traits>
-#include <vector>
 
 template <typename T, typename = std::void_t<>>
 struct is_iterable : std::false_type {};
@@ -30,18 +29,19 @@ public:
   template <typename T,
             std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
   float evaluate(T x) {
-    def.axis->transform(x);
-    auto node = def.axis->node(x);
-    return inter.evaluate(node, x);
+    auto x_rel = def.axis->transform(x);
+    auto node = def.axis->node(x_rel);
+    return inter.evaluate(node, x_rel);
   };
 
   template <typename T, std::enable_if_t<is_iterable<T>::value, bool> = true>
   float evaluate(T x) {
     auto node = std::array<size_t, T1::N>();
+    auto x_rel = std::array<float, T1::N>();
     for (size_t i = 0; i < T1::N; ++i) {
-      def.axis[i]->transform(x[i]);
-      node[i] = def.axis[i]->node(x[i]);
+      x_rel[i] = def.axis[i]->transform(x[i]);
+      node[i] = def.axis[i]->node(x_rel[i]);
     }
-    return inter.evaluate(node, x);
+    return inter.evaluate(node, x_rel);
   };
 };

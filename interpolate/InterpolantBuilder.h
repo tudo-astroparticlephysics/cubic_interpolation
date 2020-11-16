@@ -113,7 +113,7 @@ InterpolantBuilder<CubicSplines>::build(CubicSplines::Definition const &def,
   }
 
   auto nodes = def.axis->required_nodes();
-  auto y = std::vector<float>();
+  auto y = std::vector<float>(nodes);
 
   for (size_t n = 0; n < nodes; ++n)
       y.emplace_back(def.f(def.axis->back_node(n)));
