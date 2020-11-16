@@ -11,16 +11,15 @@
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include "BicubicSplines.h"
+#include "CubicSplines.h"
 
 template <typename T1, typename T2 = typename T1::Definition,
           typename T3 = typename T1::Data>
-struct InterpolantBuilder {
-  InterpolantBuilder() = default;
-
-  T1 build(T2 const &def, std::string save_path, std::string filename){};
-
+class InterpolantBuilder {
   T1 load(std::string path, std::string filename) {
     std::ifstream ifs(path + filename);
     if (!ifs.is_open()) {
@@ -44,6 +43,11 @@ struct InterpolantBuilder {
     }
     return false;
   };
+
+public:
+  InterpolantBuilder() = default;
+
+  T1 build(T2 const &def, std::string save_path, std::string filename);
 };
 
 template <>
@@ -92,4 +96,31 @@ InterpolantBuilder<BicubicSplines>::build(BicubicSplines::Definition const &def,
     std::cout << "storage of tables have failed" << std::endl;
 
   return BicubicSplines(y, dydx1, dydx2, d2ydx1dx2);
+}
+
+template <>
+CubicSplines
+InterpolantBuilder<CubicSplines>::build(CubicSplines::Definition const &def,
+                                          std::string save_path,
+                                          std::string filename) {
+  using boost::math::differentiation::finite_difference_derivative;
+
+  try {
+    return load(save_path, filename);
+  } catch (std::system_error const &ex) {
+    if (ex.code().value() != ENOENT)
+      throw ex;
+  }
+
+  auto nodes = def.axis->required_nodes();
+  auto y = std::vector<float>();
+
+  for (size_t n = 0; n < nodes; ++n)
+      y.emplace_back(def.f(def.axis->back_node(n)));
+
+  bool sucess = save(save_path, filename, y);
+  if (not sucess)
+    std::cout << "storage of tables have failed" << std::endl;
+
+  return CubicSplines(y);
 }

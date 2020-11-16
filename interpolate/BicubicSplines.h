@@ -2,8 +2,7 @@
 
 #include <Eigen/Dense>
 #include <boost/math/differentiation/finite_difference.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/access.hpp>
 #include <cassert>
 #include <functional>
 

@@ -30,7 +30,6 @@ execute_process(
 set(CMAKE_CXX_COMPILER_NAME:STRING="NotFound")
 if (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
     set(CMAKE_CXX_COMPILER_NAME "clang")
-    string(APPEND CMAKE_CXX_FLAGS " --gcc-toolchain")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_COMPILER_NAME "gcc")
 else ()

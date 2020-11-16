@@ -1,0 +1,5 @@
+add_executable(1dim_example 1dim_example.cxx)
+target_link_libraries(1dim_example INTERPOLATE)
+
+add_executable(2dim_example 2dim_example.cxx)
+target_link_libraries(2dim_example INTERPOLATE)

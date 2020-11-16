@@ -1,8 +1,5 @@
 add_library(INTERPOLATE INTERFACE)
 
-find_package(Eigen3 3.3 QUIET REQUIRED NO_MODULE)
-find_package(Boost 1.58.0 QUIET REQUIRED serialization)
-
 target_include_directories(INTERPOLATE INTERFACE
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
