@@ -19,7 +19,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(eigen)
 
-set(BOOST_LIBS serialization)
+set(BOOST_LIBS serialization filesystem)
 include(boost)
 
 add_subdirectory(interpolate)

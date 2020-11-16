@@ -14,32 +14,40 @@
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <boost/filesystem.hpp>
+
 #include "BicubicSplines.h"
 #include "CubicSplines.h"
 
 template <typename T1, typename T2 = typename T1::Definition,
           typename T3 = typename T1::Data>
 class InterpolantBuilder {
-  T1 load(std::string path, std::string filename) {
-    std::ifstream ifs(path + filename);
-    if (!ifs.is_open()) {
-      throw std::system_error(ENOENT, std::generic_category(),
-                              "Interpolation tables couldn't be found.");
+
+  T1 load(boost::filesystem::path path, boost::filesystem::path filename) {
+    if (boost::filesystem::is_regular_file(path / filename)) {
+      std::ifstream ifs((path / filename).c_str());
+      auto Data = T3();
+      if (ifs.is_open()) {
+        boost::archive::text_iarchive ia(ifs);
+        ia >> Data;
+        return Data.build();
+      }
     }
-    auto Data = T3();
-    boost::archive::text_iarchive ia(ifs);
-    ia >> Data;
-    return Data.build();
+    throw std::system_error(ENOENT, std::generic_category(),
+                            "Interpolation tables couldn't be found");
   };
 
   template <typename... T>
-  bool save(std::string path, std::string filename, T... args) {
-    auto data = T3(args...);
-    std::ofstream ofs(path + filename);
-    while (ofs.good()) {
-      boost::archive::text_oarchive oa(ofs);
-      oa << data;
-      return true;
+  bool save(boost::filesystem::path path, boost::filesystem::path filename,
+            T... args) {
+    if (not boost::filesystem::exists(path / filename)) {
+      auto data = T3(args...);
+      std::ofstream ofs((path / filename).c_str());
+      while (ofs.good()) {
+        boost::archive::text_oarchive oa(ofs);
+        oa << data;
+        return true;
+      }
     }
     return false;
   };
@@ -101,22 +109,23 @@ InterpolantBuilder<BicubicSplines>::build(BicubicSplines::Definition const &def,
 template <>
 CubicSplines
 InterpolantBuilder<CubicSplines>::build(CubicSplines::Definition const &def,
-                                          std::string save_path,
-                                          std::string filename) {
+                                        std::string save_path,
+                                        std::string filename) {
   using boost::math::differentiation::finite_difference_derivative;
 
   try {
     return load(save_path, filename);
   } catch (std::system_error const &ex) {
-    if (ex.code().value() != ENOENT)
+    if (ex.code().value() != ENOENT) {
       throw ex;
+    }
   }
 
   auto nodes = def.axis->required_nodes();
   auto y = std::vector<float>(nodes);
 
   for (size_t n = 0; n < nodes; ++n)
-      y.emplace_back(def.f(def.axis->back_node(n)));
+    y[n] = def.f(def.axis->back_node(n));
 
   bool sucess = save(save_path, filename, y);
   if (not sucess)

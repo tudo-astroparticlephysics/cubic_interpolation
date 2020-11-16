@@ -12,6 +12,7 @@ target_link_libraries (
     INTERFACE
     Eigen3::Eigen
     Boost::serialization
+    Boost::filesystem
     )
 
 

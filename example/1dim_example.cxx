@@ -18,15 +18,17 @@ int main(int argc, char *argv[]) {
 
   auto def = CubicSplines::Definition();
   def.f = func;
-  def.axis = std::make_unique<LinAxis>(-4.f, 4.f, (size_t)20);
+  def.axis = std::make_unique<LinAxis>(-2.f, 2.f, (size_t)5);
 
   auto path = "/home/msackel/.local/share/PROPOSAL/";
+  /* auto path = "/sdfa"; */
   auto tablename = "43.txt";
   auto inter = Interpolant<CubicSplines>(std::move(def), path, tablename);
 
   auto point = std::atof(argv[1]);
   auto res = inter.evaluate(point);
 
+  std::cout << "func(" << point << "): " << func(point)<< std::endl;
   std::cout << "f(" << point << "): " << res << std::endl;
 
   return 0;
