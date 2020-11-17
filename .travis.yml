@@ -1,0 +1,27 @@
+language: cpp
+
+cache:
+    directories:
+        - build
+        - bin
+        - share
+
+
+beforce_cache:
+    - cd build && rm -rf -- !(_deps)
+
+env:
+    - BOOST_ROOT=build/_deps/boost-build Eigen3_DIR=build/_deps/eigen3-build
+
+before_install:
+    - if [[ ! -e bin/cmake || ! -d share/cmake-3.19 ]];
+          then wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3-Linux-x86_64.sh;
+          chmod +x cmake-3.*.sh;
+          ./cmake-3.*.sh --skip-license --exclude-subdir;
+      fi
+
+install:
+    - bin/cmake -B build .
+    - make -C build
+
+script: make -C build test

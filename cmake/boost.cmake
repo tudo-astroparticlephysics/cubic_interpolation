@@ -1,7 +1,7 @@
 include(FetchContent)
-message(CHECK_START "Searching boost")
 
-find_package(Boost 1.58.0 COMPONENTS ${BOOST_LIBS})
+message(CHECK_START "Searching boost")
+find_package(Boost 1.58.0 QUIET COMPONENTS ${BOOST_LIBS})
 if(Boost_FOUND)
     message(STATUS "  found includes in: ${Boost_INCLUDE_DIRS}")
     message(STATUS "  found includes in: ${Boost_LIBRARY_DIRS}")
@@ -21,7 +21,6 @@ if(NOT boost_POPULATED)
     FetchContent_Populate(boost)
 endif()
 
-message(STATUS "CMAKE_INSTALL_PREFIX =${CMAKE_INSTALL_PREFIX}")
 execute_process(
     COMMAND ${boost_SOURCE_DIR}/bootstrap.sh ${CMAKE_CXX_COMPILER_NAME}
     WORKING_DIRECTORY ${boost_SOURCE_DIR}
@@ -43,14 +42,41 @@ foreach(lib IN LISTS BOOST_LIBS)
     list(APPEND BUILD_FLAGS "--with-${lib}")
 endforeach()
 
+if(Boost_USE_STATIC_RUNTIME)
+    list(APPEND BUILD_FLAGS "runtime-link=static")
+endif()
+
+if(Boost_USE_DEBUG_RUNTIME)
+    list(APPEND BUILD_FLAGS "runtime-debugging=on")
+endif()
+
+if(Boost_USE_DEBUG_PYTHON)
+    list(APPEND BUILD_FLAGS "python-debugging=on")
+endif()
+
+if(Boost_USE_DEBUG_LIBS)
+    list(APPEND BUILD_FLAGS "variant=debug")
+endif()
+
+if(Boost_USE_STLPORT)
+    list(APPEND BUILD_FLAGS "stdlib=stlport")
+else()
+    list(APPEND BUILD_FLAGS "stdlib=native")
+endif()
+
+foreach(flag IN LISTS BOOST_FLAGS)
+    message(STATUS "BOOST_FLAG: ${flag}")
+endforeach()
+
 execute_process(
     COMMAND ./b2 install ${BUILD_FLAGS} --prefix=${boost_BINARY_DIR}
     WORKING_DIRECTORY ${boost_SOURCE_DIR}
     )
 
-set(BOOST_ROOT ${boost_BINARY_DIR} CACHE
-    PATH "Preferred Boost installation prefix")
-set(BOOST_INCLUDEDIR ${boost_BINARY_DIR}/include CACHE
-    PATH "Preferred Boost include directory")
-set(BOOST_LIBRARYDIR ${boost_BINARY_DIR}/lib CACHE
-    PATH "Preferred Boost library directory ")
+set(BOOST_ROOT ${boost_BINARY_DIR} CACHE PATH "Preferred Boost installation prefix")
+set(BOOST_INCLUDEDIR ${boost_BINARY_DIR}/include CACHE PATH "Preferred Boost include directory")
+set(BOOST_LIBRARYDIR ${boost_BINARY_DIR}/lib CACHE PATH "Preferred Boost library directory ")
+
+find_package(Boost 1.58.0 REQUIRED QUIET COMPONENTS ${BOOST_LIBS})
+
+message(CHECK_PASS "done.")

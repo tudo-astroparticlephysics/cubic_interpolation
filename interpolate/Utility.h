@@ -2,18 +2,18 @@
 
 #include "Axis.h"
 #include "InterpolantBuilder.h"
-#include <array>
-#include <cmath>
-#include <iostream>
-#include <memory>
-#include <type_traits>
 
-template <typename T, typename = std::void_t<>>
+#include <array>
+#include <boost/type_traits/make_void.hpp>
+#include <memory>
+#include <utility>
+
+template <typename T, typename = boost::void_t<>>
 struct is_iterable : std::false_type {};
 
 template <typename T>
-struct is_iterable<T, std::void_t<decltype(std::declval<T>().begin(),
-                                           std::declval<T>().end())>>
+struct is_iterable<T, boost::void_t<decltype(std::declval<T>().begin(),
+                                             std::declval<T>().end())>>
     : std::true_type {};
 
 template <typename T1, typename T2 = typename T1::Definition>

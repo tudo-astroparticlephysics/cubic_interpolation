@@ -1,5 +1,5 @@
 #include <array>
-#include <cstdlib>
+#include <string>
 #include <iostream>
 #include <memory>
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   auto tablename = "42.txt";
   auto inter = Interpolant<BicubicSplines>(std::move(def), path, tablename);
 
-  auto point = std::array<float, 2>{std::atof(argv[1]), std::atof(argv[2])};
+  auto point = std::array<float, 2>{std::stof(argv[1]), std::stof(argv[2])};
   auto res = inter.evaluate(point);
 
   std::cout << "f(" << point[0] << ", " << point[1] << "): " << res
