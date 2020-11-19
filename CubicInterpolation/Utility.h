@@ -16,6 +16,9 @@ struct is_iterable<T, boost::void_t<decltype(std::declval<T>().begin(),
                                              std::declval<T>().end())>>
     : std::true_type {};
 
+/**
+ * @brief a
+ */
 template <typename T1, typename T2 = typename T1::Definition>
 class Interpolant {
   T2 def;

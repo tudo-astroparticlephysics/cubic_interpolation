@@ -8,6 +8,9 @@
 
 #include "Axis.h"
 
+/**
+ * @brief 1dim cubic spline interpolation desc
+ */
 class CubicSplines {
   boost::math::interpolators::cardinal_cubic_b_spline<float> spline;
 

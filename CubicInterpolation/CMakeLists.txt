@@ -1,14 +1,13 @@
-add_library(INTERPOLATE INTERFACE)
+add_library(CubicInterpolation INTERFACE)
 
-target_include_directories(INTERPOLATE INTERFACE
-    INTERFACE
+target_include_directories(CubicInterpolation INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     ${Boost_INCLUDE_DIRS}
     )
 
 target_link_libraries (
-    INTERPOLATE
+    CubicInterpolation
     INTERFACE
     Eigen3::Eigen
     Boost::serialization
@@ -16,7 +15,7 @@ target_link_libraries (
     )
 
 
-install(TARGETS INTERPOLATE
+install(TARGETS CubicInterpolation
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

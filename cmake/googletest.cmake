@@ -2,7 +2,6 @@ include(FetchContent)
 
 message(CHECK_START "Searching googletest")
 find_package(GTest COMPONENTS GTest::GTest)
-message(STATUS "GTEST_ROOT ${GTEST_ROOT}")
 if(GTest_FOUND)
     message(STATUS "  found includes in: ${GTEST_INCLUDE_DIRS}")
     message(STATUS "  found lib in: ${GTEST_LIBRARIES}")
