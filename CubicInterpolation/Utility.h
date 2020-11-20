@@ -24,27 +24,29 @@ class Interpolant {
   T2 def;
   T1 inter;
 
+  template <typename T> float back_transform(T trafo, float val) {
+    if (trafo)
+      val = trafo->back_transform(val);
+    return val;
+  }
+
 public:
   Interpolant(T2 &&_def, std::string _path, std::string _filename)
       : def(std::move(_def)),
         inter(InterpolantBuilder<T1>().build(def, _path, _filename)){};
 
-  template <typename T,
-            std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-  float evaluate(T x) {
-    auto x_rel = def.axis->transform(x);
-    auto node = def.axis->node(x_rel);
-    return inter.evaluate(node, x_rel);
+  float evaluate(float x) {
+    auto x_transformed = def.axis->transform(x);
+    auto val = inter.evaluate(x_transformed);
+    return back_transform(def.f_trafo.get(), val);
   };
 
   template <typename T, std::enable_if_t<is_iterable<T>::value, bool> = true>
   float evaluate(T x) {
-    auto node = std::array<size_t, T1::N>();
-    auto x_rel = std::array<float, T1::N>();
-    for (size_t i = 0; i < T1::N; ++i) {
-      x_rel[i] = def.axis[i]->transform(x[i]);
-      node[i] = def.axis[i]->node(x_rel[i]);
-    }
-    return inter.evaluate(node, x_rel);
+    auto x_transformed = std::array<float, T1::N>();
+    for (size_t i = 0; i < T1::N; ++i)
+      x_transformed[i] = def.axis[i]->transform(x[i]);
+    auto val = inter.evaluate(x_transformed);
+    return back_transform(def.f_trafo.get(), val);
   };
 };

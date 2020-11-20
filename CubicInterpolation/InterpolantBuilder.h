@@ -64,26 +64,22 @@ InterpolantBuilder<BicubicSplines>::build(BicubicSplines::Definition const &def,
                                           std::string save_path,
                                           std::string filename) {
   using boost::math::differentiation::finite_difference_derivative;
-
   try {
     return load(save_path, filename);
   } catch (std::system_error const &ex) {
     if (ex.code().value() != ENOENT)
       throw ex;
   }
-
   auto x1nodes = def.axis[0]->required_nodes();
   auto x2nodes = def.axis[1]->required_nodes();
-
   auto y = Eigen::MatrixXf(x1nodes, x2nodes);
   auto dydx1 = Eigen::MatrixXf(x1nodes, x2nodes);
   auto dydx2 = Eigen::MatrixXf(x1nodes, x2nodes);
   auto d2ydx1dx2 = Eigen::MatrixXf(x1nodes, x2nodes);
-
   for (size_t n1 = 0; n1 < x1nodes; ++n1) {
     for (size_t n2 = 0; n2 < x2nodes; ++n2) {
-      auto x1 = def.axis[0]->back_node(n1);
-      auto x2 = def.axis[1]->back_node(n2);
+      auto x1 = def.axis[0]->back_transform(n1);
+      auto x2 = def.axis[1]->back_transform(n2);
 
       y(n1, n2) = def.f(x1, x2);
       dydx1(n1, n2) = finite_difference_derivative(
@@ -98,38 +94,44 @@ InterpolantBuilder<BicubicSplines>::build(BicubicSplines::Definition const &def,
           x1);
     }
   }
-
   bool sucess = save(save_path, filename, y, dydx1, dydx2, d2ydx1dx2);
   if (not sucess)
     std::cout << "storage of tables have failed" << std::endl;
-
   return BicubicSplines(y, dydx1, dydx2, d2ydx1dx2);
 }
+
+#include <boost/math/differentiation/finite_difference.hpp>
 
 template <>
 CubicSplines
 InterpolantBuilder<CubicSplines>::build(CubicSplines::Definition const &def,
-                                        std::string save_path,
+                                        std::string path,
                                         std::string filename) {
   using boost::math::differentiation::finite_difference_derivative;
-
   try {
-    return load(save_path, filename);
+    return load(path, filename);
   } catch (std::system_error const &ex) {
-    if (ex.code().value() != ENOENT) {
+    if (ex.code().value() != ENOENT)
       throw ex;
-    }
   }
-
-  auto nodes = def.axis->required_nodes();
-  auto y = std::vector<float>(nodes);
-
-  for (size_t n = 0; n < nodes; ++n)
-    y[n] = def.f(def.axis->back_node(n));
-
-  bool sucess = save(save_path, filename, y);
+  auto y = std::vector<float>(def.axis->required_nodes());
+  auto func = [&def](float x) {
+    auto fx = def.f(x);
+    if (def.f_trafo)
+      fx = def.f_trafo->transform(fx);
+    return fx;
+  };
+  for (size_t n = 0; n < y.size(); ++n)
+    y[n] = func(def.axis->back_transform(n));
+  auto low = def.axis->back_transform(0);
+  auto low_lim_derivate =
+      finite_difference_derivative(func, low) * def.axis->derive(low);
+  auto up = def.axis->back_transform(y.size() - 1);
+  auto up_lim_derivate = finite_difference_derivative(
+                             func, def.axis->back_transform(y.size() - 1)) *
+                         def.axis->derive(up);
+  bool sucess = save(path, filename, y, low_lim_derivate, up_lim_derivate);
   if (not sucess)
     std::cout << "storage of tables have failed" << std::endl;
-
-  return CubicSplines(y);
+  return CubicSplines(y, low_lim_derivate, up_lim_derivate);
 }

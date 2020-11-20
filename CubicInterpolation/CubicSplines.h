@@ -2,6 +2,7 @@
 
 #include <boost/math/interpolators/cardinal_cubic_b_spline.hpp>
 #include <boost/serialization/access.hpp>
+#include <cassert>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -9,33 +10,59 @@
 #include "Axis.h"
 
 /**
- * @brief 1dim cubic spline interpolation desc
+ * @brief One dimensional cubic splines class. Tables are build from the lower
+ * limit zero with a stepsize from one. If a function has an different
+ * definition area it will be  transformed with the Axis transformations
+ * specified in the CubicSplines::Definition.
  */
 class CubicSplines {
   boost::math::interpolators::cardinal_cubic_b_spline<float> spline;
 
 public:
-  CubicSplines() = default;
-
-  template <typename T>
-  CubicSplines(T val) : spline(val.data(), val.size(), 0, 1) {}
+  /**
+   * @brief Initialization of an 1-dim cubic spline with an ordered iterable
+   * container stored the values to interpolate to the corresponding axis
+   */
+  template <typename T1, typename T2>
+  CubicSplines(T1 val, T2 lower_lim_derivate, T2 upper_lim_derivate)
+      : spline(val.data(), val.size(), 0, 1, lower_lim_derivate,
+               upper_lim_derivate) {}
 
   static constexpr size_t N = 1;
 
   struct Definition;
 
-  struct Data;
+  class Data;
 
-  float evaluate(int node, float x) { return spline(x + node); };
+  /**
+   * @brief Calculate the function value to the given axis.
+   *
+   * @param node largest node which is smaller than the evaluated point
+   * @param x relative distance from the node to the point in scale from the
+   * nearest lower node to the smallest higher node.
+   *
+   * @return the interpolated value with no knowledge about the transformation
+   * which might has choosen.
+   */
+  float evaluate(float x) { return spline(x); };
 };
 
+/**
+ * @brief Properties of an *1-dim* interpolation object.
+ */
 struct CubicSplines::Definition {
-  std::function<float(float)> f;
-  std::unique_ptr<Axis> f_trafo = nullptr;
-  std::unique_ptr<Axis> axis;
+  std::function<float(float)> f;           // function to evaluate
+  std::unique_ptr<Axis> f_trafo = nullptr; // trafo of function values
+  std::unique_ptr<Axis> axis;              // trafo of axis
 };
 
+/**
+ * @brief Storage class to write and load the interpolation tables from  disk.
+ * After reading and writing the object will be destructed.
+ */
 class CubicSplines::Data {
+  float lower_lim_derivate;
+  float upper_lim_derivate;
   std::vector<float> y;
 
   friend class boost::serialization::access;
@@ -44,9 +71,24 @@ class CubicSplines::Data {
   }
 
 public:
+  /**
+   * @brief Provides a storage class to load the *1-dim* interpolation tables.
+   */
   Data() = default;
 
-  template <typename T> Data(T &&_y) : y(std::forward<T>(_y)){};
+  /**
+   * @brief Stores the data of an ordered iterable container, to provide a
+   * minimal serialization class.
+   */
+  template <typename T>
+  Data(T const &_y, float _lower_lim_derivate, float _upper_lim_derivate)
+      : y(_y.begin(), _y.end()), lower_lim_derivate(_lower_lim_derivate),
+        upper_lim_derivate(_upper_lim_derivate){};
 
-  CubicSplines build() { return CubicSplines(y); };
+  /**
+   * @brief Builds out of the interpolation table a Cubic splines object.
+   */
+  CubicSplines build() {
+    return CubicSplines(y, lower_lim_derivate, upper_lim_derivate);
+  };
 };

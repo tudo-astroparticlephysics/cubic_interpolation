@@ -31,15 +31,17 @@ public:
 
   struct Data;
 
-  template <typename T, typename Y> float evaluate(T node, Y x) {
-    assert(2 == node.size());
+  template <typename T> float evaluate(T x) {
     assert(2 == x.size());
 
+    auto n0 = std::floor(x[0]);
+    auto n1 = std::floor(x[1]);
+
     auto temp = Eigen::Matrix4f(4, 4);
-    temp.block<2, 2>(0, 0) = y.block(node[0], node[1], 2, 2);
-    temp.block<2, 2>(2, 0) = dydx1.block(node[0], node[1], 2, 2);
-    temp.block<2, 2>(0, 2) = dydx2.block(node[0], node[1], 2, 2);
-    temp.block<2, 2>(2, 2) = d2ydx1dx2.block(node[0], node[1], 2, 2);
+    temp.block<2, 2>(0, 0) = y.block(n0, n1, 2, 2);
+    temp.block<2, 2>(2, 0) = dydx1.block(n0, n1, 2, 2);
+    temp.block<2, 2>(0, 2) = dydx2.block(n0, n1, 2, 2);
+    temp.block<2, 2>(2, 2) = d2ydx1dx2.block(n0, n1, 2, 2);
 
     auto x1 = Eigen::Vector4f(4);
     auto x2 = Eigen::Vector4f(4);
