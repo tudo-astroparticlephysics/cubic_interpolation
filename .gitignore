@@ -1,5 +1,1 @@
 build/
-
-docs/*
-!docs/Doxyfile.in
-!docs/CMakeLists.txt
