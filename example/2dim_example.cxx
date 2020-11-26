@@ -23,9 +23,7 @@ int main(int argc, char *argv[]) {
   def.axis[0] = std::make_unique<LinAxis>(-1, 1, (size_t)11);
   def.axis[1] = std::make_unique<LinAxis>(-1, 1, (size_t)11);
 
-  auto path = "/home/msackel/.local/share/PROPOSAL/";
-  auto tablename = "42.txt";
-  auto inter = Interpolant<BicubicSplines>(std::move(def), path, tablename);
+  auto inter = Interpolant<BicubicSplines>(std::move(def), "", "");
 
   auto point = std::array<float, 2>{std::stof(argv[1]), std::stof(argv[2])};
   auto res = inter.evaluate(point);

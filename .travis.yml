@@ -21,7 +21,7 @@ before_install:
       fi
 
 install:
-    - bin/cmake -B build .
-    - make -C build
+    - bin/cmake -B build . -DCMAKE_BUILD_TYPE=RELEASE
+    - make -C build -j
 
 script: make -C build test

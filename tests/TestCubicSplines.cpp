@@ -109,18 +109,40 @@ TEST(CubicSplines, evaluate_log_func_values_and_axis) {
   }
 }
 
-/* size_t sample_size = 1'000; */
-/* auto axis = std::make_unique<LinAxis>(low, high, sample_size); */
-/* std::ofstream file("test.txt"); */
-/* if (file.is_open()) { */
-/*   for (size_t i = 0; i < sample_size; ++i) { */
-/*     auto x = axis->back_transform(i); */
-/*     file << x << ", "; */
-/*     auto f_spline = spline.evaluate(x); */
-/*     file << f_spline << std::endl; */
-/*   } */
-/*   file.close(); */
-/* } */
+TEST(CubicSplines, prime) {
+  size_t N = 30;
+  auto low = 0.f;
+  auto high = 10.f;
+  auto def = CubicSplines::Definition();
+  auto func = [](double x) { return x * x + x + 1; };
+  auto df_dx = [](float x) { return 2 * x + 1; };
+  def.f = func;
+  def.axis = std::make_unique<LinAxis>(low, high, N);
+  auto spline = Interpolant<CubicSplines>(std::move(def), "", "");
+  std::uniform_real_distribution<float> dis(low, high);
+  for (int i = 0; i < 10'000; ++i) {
+    auto x = dis(gen);
+    EXPECT_NEAR(df_dx(x), spline.prime(x), std::abs(func(x)) * 1e-2);
+  }
+}
+
+TEST(CubicSplines, prime_trafo) {
+  size_t N = 30;
+  auto low = 1.e-2f;
+  auto high = 1.e2f;
+  auto def = CubicSplines::Definition();
+  auto func = [](double x) { return x * x + x + 1; };
+  auto df_dx = [](float x) { return 2 * x + 1; };
+  def.f = func;
+  def.f_trafo = std::make_unique<ExpAxis>(1, 0);
+  def.axis = std::make_unique<ExpAxis>(low, high, N);
+  auto spline = Interpolant<CubicSplines>(std::move(def), "", "");
+  std::uniform_real_distribution<float> dis(low, high);
+  for (int i = 0; i < 10'000; ++i) {
+    auto x = dis(gen);
+    EXPECT_NEAR(df_dx(x), spline.prime(x), std::abs(func(x)) * 1e-2);
+  }
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

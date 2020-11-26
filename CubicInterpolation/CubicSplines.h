@@ -30,30 +30,40 @@ public:
 
   static constexpr size_t N = 1;
 
+  /**
+   * @brief Calculate the function value to the given axis. The interpolated
+   * value with no knowledge about the transformation which might has choosen.
+   */
+  float evaluate(float x) const { return spline(x); };
+
+  float prime(float x) const { return spline.prime(x); };
+
+  float double_prime(float x) const { return spline.double_prime(x); };
+
   struct Definition;
 
   class Data;
 
-  /**
-   * @brief Calculate the function value to the given axis.
-   *
-   * @param node largest node which is smaller than the evaluated point
-   * @param x relative distance from the node to the point in scale from the
-   * nearest lower node to the smallest higher node.
-   *
-   * @return the interpolated value with no knowledge about the transformation
-   * which might has choosen.
-   */
-  float evaluate(float x) { return spline(x); };
 };
 
 /**
  * @brief Properties of an *1-dim* interpolation object.
  */
 struct CubicSplines::Definition {
-  std::function<float(float)> f;           // function to evaluate
-  std::unique_ptr<Axis> f_trafo = nullptr; // trafo of function values
-  std::unique_ptr<Axis> axis;              // trafo of axis
+  /**
+   * @brief function to evaluate
+   */
+  std::function<float(float)> f;
+
+  /**
+   * @brief trafo of function values
+   */
+  std::unique_ptr<Axis> f_trafo = nullptr;
+
+  /**
+   * @brief trafo of axis
+   */
+  std::unique_ptr<Axis> axis;
 };
 
 /**
@@ -61,9 +71,9 @@ struct CubicSplines::Definition {
  * After reading and writing the object will be destructed.
  */
 class CubicSplines::Data {
+  std::vector<float> y;
   float lower_lim_derivate;
   float upper_lim_derivate;
-  std::vector<float> y;
 
   friend class boost::serialization::access;
   template <class Archive> void serialize(Archive &ar, const unsigned int) {
@@ -71,23 +81,13 @@ class CubicSplines::Data {
   }
 
 public:
-  /**
-   * @brief Provides a storage class to load the *1-dim* interpolation tables.
-   */
   Data() = default;
 
-  /**
-   * @brief Stores the data of an ordered iterable container, to provide a
-   * minimal serialization class.
-   */
   template <typename T>
   Data(T const &_y, float _lower_lim_derivate, float _upper_lim_derivate)
       : y(_y.begin(), _y.end()), lower_lim_derivate(_lower_lim_derivate),
         upper_lim_derivate(_upper_lim_derivate){};
 
-  /**
-   * @brief Builds out of the interpolation table a Cubic splines object.
-   */
   CubicSplines build() {
     return CubicSplines(y, lower_lim_derivate, upper_lim_derivate);
   };

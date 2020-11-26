@@ -3,3 +3,6 @@ target_link_libraries(1dim_example CubicInterpolation)
 
 add_executable(2dim_example 2dim_example.cxx)
 target_link_libraries(2dim_example CubicInterpolation)
+
+add_executable(FindParameter FindParameter.cxx)
+target_link_libraries(FindParameter CubicInterpolation)

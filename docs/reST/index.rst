@@ -10,8 +10,8 @@ Welcome to Cubic Interpolation's documentation!
     :hidden:
 
     axis
-    cubicsplines
-    utility
+    splines
+    interpolant
 
 
 The aim of the `C++` written library is to interpolate functions to get an accurate

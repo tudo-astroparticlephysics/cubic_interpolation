@@ -1,0 +1,5 @@
+CubicSplines
+============
+
+.. doxygenclass:: CubicSplines
+    :members:

@@ -1,0 +1,5 @@
+LinAxis
+=======
+
+.. doxygenclass:: LinAxis
+    :members:

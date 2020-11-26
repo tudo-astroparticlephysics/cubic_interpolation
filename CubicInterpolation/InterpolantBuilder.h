@@ -52,6 +52,14 @@ class InterpolantBuilder {
     return false;
   };
 
+  template <typename... T>
+  auto transform(T2 const& def, T ...args) {
+    auto fx = def.f(args...);
+    if (def.f_trafo)
+      fx = def.f_trafo->transform(fx);
+    return fx;
+  };
+
 public:
   InterpolantBuilder() = default;
 
@@ -76,22 +84,35 @@ InterpolantBuilder<BicubicSplines>::build(BicubicSplines::Definition const &def,
   auto dydx1 = Eigen::MatrixXf(x1nodes, x2nodes);
   auto dydx2 = Eigen::MatrixXf(x1nodes, x2nodes);
   auto d2ydx1dx2 = Eigen::MatrixXf(x1nodes, x2nodes);
+  auto func = [this, &def](float x1, float x2){return transform(def, x1, x2);};
   for (size_t n1 = 0; n1 < x1nodes; ++n1) {
     for (size_t n2 = 0; n2 < x2nodes; ++n2) {
       auto x1 = def.axis[0]->back_transform(n1);
       auto x2 = def.axis[1]->back_transform(n2);
 
-      y(n1, n2) = def.f(x1, x2);
-      dydx1(n1, n2) = finite_difference_derivative(
-          [this, &def, x2](float x) { return def.f(x, x2); }, x1);
-      dydx2(n1, n2) = finite_difference_derivative(
-          [this, &def, x1](float x) { return def.f(x1, x); }, x2);
+      auto dfdx1 = def.axis[0]->derive(x1);
+      auto dfdx2 = def.axis[1]->derive(x2);
+
+      y(n1, n2) = func(x1, x2);
+      dydx1(n1, n2) =
+          finite_difference_derivative(
+              [this, &func, x2](float x) { return func(x, x2); }, x1) *
+          dfdx1;
+      dydx2(n1, n2) =
+          finite_difference_derivative(
+              [this, &func, x1](float x) { return func(x1, x); }, x2) *
+          dfdx2;
       d2ydx1dx2(n1, n2) = finite_difference_derivative(
-          [this, &def, x1, x2](float x_1) {
-            return finite_difference_derivative(
-                [this, &def, x_1](float x_2) { return def.f(x_1, x_2); }, x2);
-          },
-          x1);
+                              [this, &func, x1, x2, dfdx1, dfdx2](float x_1) {
+                                return finite_difference_derivative(
+                                           [this, &func, x_1, dfdx2](float x_2) {
+                                             return func(x_1, x_2);
+                                           },
+                                           x2) *
+                                       dfdx2;
+                              },
+                              x1) *
+                          dfdx1;
     }
   }
   bool sucess = save(save_path, filename, y, dydx1, dydx2, d2ydx1dx2);
@@ -115,12 +136,13 @@ InterpolantBuilder<CubicSplines>::build(CubicSplines::Definition const &def,
       throw ex;
   }
   auto y = std::vector<float>(def.axis->required_nodes());
-  auto func = [&def](float x) {
-    auto fx = def.f(x);
-    if (def.f_trafo)
-      fx = def.f_trafo->transform(fx);
-    return fx;
-  };
+  auto func = [this, &def](double x){return transform(def, x);};
+  /* auto func = [&def](float x) { */
+  /*   auto fx = def.f(x); */
+  /*   if (def.f_trafo) */
+  /*     fx = def.f_trafo->transform(fx); */
+  /*   return fx; */
+  /* }; */
   for (size_t n = 0; n < y.size(); ++n)
     y[n] = func(def.axis->back_transform(n));
   auto low = def.axis->back_transform(0);

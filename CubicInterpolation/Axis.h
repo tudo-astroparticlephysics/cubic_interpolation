@@ -11,10 +11,10 @@
 #include <ostream>
 
 /**
- * @brief Limits the definition area of the function which will be stored.
- * Choose the axis transformation wisely to keep the number of support points
- * and the approximation error low. Evaluate points out of range will cause
- * undefined behavour.
+ * @brief Limits the definition area of the function which will be stored and
+ * praameterize the node spaceing.  Choose the axis transformation wisely to
+ * keep the number of support points and the approximation error low. Evaluate
+ * points out of range will cause undefined behavour.
  */
 class Axis {
 protected:
@@ -46,15 +46,15 @@ public:
   virtual float transform(float x) const noexcept = 0;
 
   /**
-   * @brief Calculate the corresponding Point to the *n*-th node. The *0*-th
+   * @brief Calculate the corresponding point to the *n*-th node. The *0*-th
    * node correspond to the lower limit. The *N-1*-th represent the upper limit
-   * of the axis.
+   * of the axis. The decimal digits specify the relative distance to the next
+   * node.
    */
   virtual float back_transform(float x) const noexcept = 0;
 
   /**
-   * @brief Calculates the number of nodes required for generating the
-   * interpolation table.
+   * @brief Calculates the required number of nodes.
    */
   virtual size_t required_nodes() const {
     auto nodes = transform(high);
@@ -63,6 +63,19 @@ public:
     return nodes + 2;
   }
 
+  /**
+   * @brief Lower axis limit.
+   */
+  float GetLow() const noexcept { return low; }
+
+  /**
+   * @brief Upper axis limit.
+   */
+  float GetHigh() const noexcept { return high; }
+
+  /**
+   * @brief Derivate of the Axis forward transformation.
+   */
   virtual float derive(float x) const = 0;
 };
 

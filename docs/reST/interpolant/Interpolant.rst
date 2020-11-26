@@ -1,0 +1,5 @@
+Interpolant
+===========
+
+.. doxygenclass:: Interpolant
+    :members:
