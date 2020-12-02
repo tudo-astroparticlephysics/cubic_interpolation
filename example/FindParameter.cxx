@@ -17,7 +17,7 @@ int main() {
   auto function_value = 1.f;
   auto guess = 0.5f;
 
-  auto x = FindParameter(inter1d, function_value, guess);
+  auto x = find_parameter(inter1d, function_value, guess);
   std::cout << "f(x) = " << function_value << " -> x = " << x << std::endl;
 
   auto def2d = BicubicSplines::Definition();
@@ -30,7 +30,7 @@ int main() {
   auto x_val = 0.5f;
   auto y_guess = 3.f;
   auto searched_param = 1;
-  auto y = FindParameter(inter2d, function_value,
+  auto y = find_parameter(inter2d, function_value,
                     std::array<float, 2>{x_val, y_guess}, searched_param);
   std::cout << "f(x="<< x_val <<",y) = " << function_value << " -> y = " << y << std::endl;
   return 0;

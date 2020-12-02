@@ -1,4 +1,4 @@
 find_parameter
 ==============
 
-.. doxygenfunction:: FindParameter
+.. doxygenfunction:: find_parameter

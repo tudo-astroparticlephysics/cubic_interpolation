@@ -9,7 +9,7 @@
 std::random_device rd;
 std::mt19937 gen(rd());
 
-TEST(FindParameter, CubicSplines) {
+TEST(find_parameter, CubicSplines) {
   constexpr static size_t N = 100;
   auto func = [](float x) { return x * x * x ; };
   auto def = CubicSplines::Definition();
@@ -22,12 +22,12 @@ TEST(FindParameter, CubicSplines) {
     auto x = xaxis.back_transform(dis(gen));
     auto f = func(x);
     // search y falue for given f, x value.
-    auto x_guess = FindParameter(spline, f, 0.5f);
+    auto x_guess = find_parameter(spline, f, 0.5f);
     EXPECT_NEAR(x, x_guess, std::max(std::abs(x) * 1e-2, 1e-3));
   }
 }
 
-TEST(FindParameter, BicubicSplines) {
+TEST(find_parameter, BicubicSplines) {
   constexpr static size_t N = 100;
   auto func = [](float x1, float x2) { return x1 * x1 + x2; };
   auto def = BicubicSplines::Definition();
@@ -44,7 +44,7 @@ TEST(FindParameter, BicubicSplines) {
     auto y = yaxis.back_transform(dis(gen));
     auto f = func(x, y);
     // search y falue for given f, x value.
-    auto y_guess = FindParameter(spline, f, std::array<float, 2>{x, 0.5f}, 1);
+    auto y_guess = find_parameter(spline, f, std::array<float, 2>{x, 0.5f}, 1);
     EXPECT_NEAR(y, y_guess, std::max(std::abs(y) * 1e-2, 1e-3));
   }
 }
