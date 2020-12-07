@@ -1,4 +1,4 @@
-#include "Axis.h"
+#include "CubicInterpolation/Axis.h"
 #include "gtest/gtest.h"
 #include <cmath>
 
@@ -6,7 +6,7 @@ TEST(LinAxis, transform) {
   auto MIN_VALUE = 0.f;
   auto MAX_VALUE = 10.f;
   auto STEPSIZE = 1.f;
-  auto lin = LinAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
+  auto lin = cubic_splines::LinAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
 
   auto x = 1.f;
   auto x_transformed = lin.transform(x);
@@ -28,7 +28,7 @@ TEST(LinAxis, back_transform) {
   auto MIN_VALUE = 0.f;
   auto MAX_VALUE = 10.f;
   auto STEPSIZE = 1.f;
-  auto lin = LinAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
+  auto lin = cubic_splines::LinAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
 
   auto n = 3;
   auto x = lin.back_transform(n);
@@ -40,11 +40,11 @@ TEST(LinAxis, number_of_nodes) {
   auto MAX_VALUE = 10.f;
 
   auto stepsize = 0.5f;
-  auto lin = LinAxis(MIN_VALUE, MAX_VALUE, stepsize);
+  auto lin = cubic_splines::LinAxis(MIN_VALUE, MAX_VALUE, stepsize);
   EXPECT_EQ(21, lin.required_nodes());
 
   stepsize = 0.333f;
-  lin = LinAxis(MIN_VALUE, MAX_VALUE, stepsize);
+  lin = cubic_splines::LinAxis(MIN_VALUE, MAX_VALUE, stepsize);
   EXPECT_EQ(32, lin.required_nodes());
 }
 
@@ -52,7 +52,7 @@ TEST(ExpAxis, node) {
   auto MIN_VALUE = 1e0f;
   auto MAX_VALUE = 1e14f;
   auto STEPSIZE = std::log(10.f);
-  auto log = ExpAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
+  auto log = cubic_splines::ExpAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
 
   auto x = 1.234e4f;
   auto x_transformed = log.transform(x);
@@ -65,7 +65,7 @@ TEST(ExpAxis, back_transform) {
   auto MIN_VALUE = 1e0f;
   auto MAX_VALUE = 1e14f;
   auto STEPSIZE = std::log(10.f);
-  auto log = ExpAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
+  auto log = cubic_splines::ExpAxis(MIN_VALUE, MAX_VALUE, STEPSIZE);
 
   auto n = 3;
   auto x = log.back_transform(n);
@@ -73,13 +73,13 @@ TEST(ExpAxis, back_transform) {
 }
 
 TEST(ExpAxis, number_of_nodes) {
-  auto log = ExpAxis(1e0f, 1e14f, std::log(10.f));
+  auto log = cubic_splines::ExpAxis(1e0f, 1e14f, std::log(10.f));
   EXPECT_EQ(15, log.required_nodes());
 
-  log = ExpAxis(2, 2048, std::log(2.f));
+  log = cubic_splines::ExpAxis(2, 2048, std::log(2.f));
   EXPECT_EQ(11, log.required_nodes());
 
-  log = ExpAxis(2, 2048, std::log(1.9f));
+  log = cubic_splines::ExpAxis(2, 2048, std::log(1.9f));
   EXPECT_EQ(12, log.required_nodes());
 }
 

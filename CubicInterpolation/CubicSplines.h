@@ -2,13 +2,13 @@
 
 #include <boost/math/interpolators/cardinal_cubic_b_spline.hpp>
 #include <boost/serialization/access.hpp>
-#include <cassert>
 #include <functional>
 #include <memory>
 #include <vector>
 
 #include "Axis.h"
 
+namespace cubic_splines {
 /**
  * @brief One dimensional cubic splines class. Tables are build from the lower
  * limit zero with a stepsize from one. If a function has an different
@@ -34,16 +34,15 @@ public:
    * @brief Calculate the function value to the given axis. The interpolated
    * value with no knowledge about the transformation which might has choosen.
    */
-  float evaluate(float x) const { return spline(x); };
+  float evaluate(float x) const;
 
-  float prime(float x) const { return spline.prime(x); };
+  float prime(float x) const;
 
-  float double_prime(float x) const { return spline.double_prime(x); };
+  float double_prime(float x) const;
 
   struct Definition;
 
   class Data;
-
 };
 
 /**
@@ -58,12 +57,12 @@ struct CubicSplines::Definition {
   /**
    * @brief trafo of function values
    */
-  std::unique_ptr<Axis> f_trafo = nullptr;
+  std::unique_ptr<cubic_splines::Axis> f_trafo = nullptr;
 
   /**
    * @brief trafo of axis
    */
-  std::unique_ptr<Axis> axis;
+  std::unique_ptr<cubic_splines::Axis> axis;
 };
 
 /**
@@ -88,7 +87,6 @@ public:
       : y(_y.begin(), _y.end()), lower_lim_derivate(_lower_lim_derivate),
         upper_lim_derivate(_upper_lim_derivate){};
 
-  CubicSplines build() {
-    return CubicSplines(y, lower_lim_derivate, upper_lim_derivate);
-  };
+  CubicSplines build() const;
 };
+} // namespace cubic_splines

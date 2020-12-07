@@ -1,6 +1,6 @@
+
 #pragma once
 
-#include "Axis.h"
 #include "InterpolantBuilder.h"
 
 #include <array>
@@ -17,6 +17,7 @@ struct is_iterable<T, boost::void_t<decltype(std::declval<T>().begin(),
                                              std::declval<T>().end())>>
     : std::true_type {};
 
+namespace cubic_splines {
 /**
  * @brief Utility class for a better handling of interpolants. Take care about
  * transformation of axis building, loading and storage of intepolation tables.
@@ -38,7 +39,7 @@ class Interpolant {
     auto x_transformed = def.axis->transform(x);
     auto val = inter.evaluate(x_transformed);
     return back_transform(def.f_trafo.get(), val);
-  };
+  }
 
   template <typename T, std::enable_if_t<is_iterable<T>::value, bool> = true>
   auto _evaluate(T x) const {
@@ -47,7 +48,7 @@ class Interpolant {
       x_transformed[i] = def.axis[i]->transform(x[i]);
     auto val = inter.evaluate(x_transformed);
     return back_transform(def.f_trafo.get(), val);
-  };
+  }
 
   template <typename T,
             std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
@@ -71,9 +72,10 @@ class Interpolant {
         val[i] *= def.f_trafo->derive(evaluate(x));
     }
     return val;
-  };
+  }
 
 public:
+
   /**
    * @brief To initaialize a Interpolant the corresponding definition to the
    * Interpolant type is required and a path where to store the tables, as well
@@ -82,7 +84,7 @@ public:
    */
   Interpolant(T2 &&_def, std::string _path = "", std::string _filename = "")
       : def(std::move(_def)),
-        inter(InterpolantBuilder<T1>().build(def, _path, _filename)){};
+        inter(InterpolantBuilder<T1>().build(def, _path, _filename)){}
 
   /**
    * @brief Evaluation of the interpolant, takeing axis and function value trafo
@@ -106,30 +108,29 @@ public:
   T2 const &GetDefinition() const { return def; };
 };
 
-#include <boost/math/tools/roots.hpp>
+namespace detail {
+
+float _find_parameter(std::function<std::tuple<float,float>(float)> f, float x, Axis const &axis);
 
 template <typename T1, typename T2>
-auto _find_parameter(T1 const &interpolant, float val, T2 x, size_t n) {
+auto find_parameter(T1 const &interpolant, float val, T2 x, size_t n) {
   auto f = [&interpolant, val, &x, n](float xi) {
     x[n] = xi;
     return std::make_tuple(interpolant.evaluate(x) - val,
                            interpolant.prime(x)[n]);
   };
-  auto low = interpolant.GetDefinition().axis[n]->GetLow();
-  auto high = interpolant.GetDefinition().axis[n]->GetHigh();
-  return boost::math::tools::newton_raphson_iterate(f, x[n], low, high, 10);
+  return detail::_find_parameter(f, x[n], *interpolant.GetDefinition().axis[n]);
 }
 
 template <typename T1>
-auto _find_parameter(T1 const &interpolant, float val, float x) {
-  auto func = [&interpolant, val](float xi) {
+auto find_parameter(T1 const &interpolant, float val, float x) {
+  auto f = [&interpolant, val](float xi) {
     return std::make_tuple(interpolant.evaluate(xi) - val,
                            interpolant.prime(xi));
   };
-  auto low = interpolant.GetDefinition().axis->GetLow();
-  auto high = interpolant.GetDefinition().axis->GetHigh();
-  return boost::math::tools::newton_raphson_iterate(func, x, low, high, 10);
+  return detail::_find_parameter(f, x, *interpolant.GetDefinition().axis);
 }
+} // namespace detail
 
 /**
  * @brief If the function value and the parameter except one are known, the
@@ -143,6 +144,7 @@ auto _find_parameter(T1 const &interpolant, float val, float x) {
  * @param n if multidimensional interpolant, number which variable to estimate
  */
 template <typename T1, typename... Args>
-auto inline find_parameter(T1 const &interpolant, float val, Args... args) {
-  return _find_parameter(interpolant, val, args...);
+auto find_parameter(T1 const &interpolant, float val, Args... args) {
+  return detail::find_parameter(interpolant, val, args...);
 }
+} // namespace cubic_splines

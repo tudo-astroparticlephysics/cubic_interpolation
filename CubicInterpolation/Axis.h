@@ -1,15 +1,8 @@
-/**
- * @file dlfajsldfjkasl;d dsfkld
- *
- */
-
 #pragma once
 
-#include <cassert>
-#include <cmath>
-#include <iostream>
 #include <ostream>
 
+namespace cubic_splines {
 /**
  * @brief Limits the definition area of the function which will be stored and
  * praameterize the node spaceing.  Choose the axis transformation wisely to
@@ -20,9 +13,7 @@ class Axis {
 protected:
   float low, high, stepsize;
 
-  virtual void print(std::ostream &os) const {
-    os << "low: " << low << ", high: " << high << ", stepsize: " << stepsize;
-  };
+  virtual void print(std::ostream &os) const;
 
   friend std::ostream &operator<<(std::ostream &out, const Axis &);
 
@@ -35,13 +26,12 @@ public:
    * @param _high upper limit of the axis
    * @param _stepsize stepsize in values of the transformation
    */
-  Axis(float _low, float _high, float _stepsize)
-      : low(_low), high(_high), stepsize(_stepsize) {}
+  Axis(float _low, float _high, float _stepsize);
 
   /**
-   * @brief Return the corresponding lower node which is nearest to the point
-   * and manipulate the *x*-value to the relative distance from the node to the
-   * next one.
+   * @brief Return the corresponding lower node which is nearest to the
+   * point and manipulate the *x*-value to the relative distance from the
+   * node to the next one.
    */
   virtual float transform(float x) const noexcept = 0;
 
@@ -56,12 +46,7 @@ public:
   /**
    * @brief Calculates the required number of nodes.
    */
-  virtual size_t required_nodes() const {
-    auto nodes = transform(high);
-    if (std::floor(nodes) == nodes)
-      return nodes + 1;
-    return nodes + 2;
-  }
+  virtual size_t required_nodes() const;
 
   /**
    * @brief Lower axis limit.
@@ -79,79 +64,58 @@ public:
   virtual float derive(float x) const = 0;
 };
 
-/**
- * @brief Linear axis to describe data which varify not to much in orders of
- * magnitudes. It's the fastest axis evaluation.
- */
-class LinAxis : public Axis {
-  void print(std::ostream &os) const {
-    os << "LinAxis(";
-    Axis::print(os);
-    os << ")";
-  }
+std::ostream &operator<<(std::ostream &out, const Axis &axis);
+} // namespace cubic_splines
 
-public:
-  /**
-   * @brief Linear Axis initalized with stepsize.
-   */
-  LinAxis(float _low, float _high, float _stepsize)
-      : Axis(_low, _high, _stepsize) {}
-
-  /**
-   * @brief Linear Axis with number of nodes.
-   */
-  LinAxis(float _low, float _high, size_t _nodes) : Axis(_low, _high, 0.f) {
-    stepsize = (high - low) / (_nodes - 1);
-  }
-
-  inline float transform(float x) const noexcept final {
-    return (x - low) / stepsize;
-  }
-  inline float back_transform(float x) const noexcept final {
-    return x * stepsize + low;
-  }
-
-  float derive(float) const final { return stepsize; }
-};
-
+namespace cubic_splines {
 /**
  * @brief Exponential axis to interpolate over many different scales. As basis
  * the euler number choosen by default if no further specified. Nodes will
  * distributed in form of \f$ \exp(n \cdot \text{stepsize}) \f$
  */
 class ExpAxis : public Axis {
-  void print(std::ostream &os) const {
-    os << "ExpAxis(";
-    Axis::print(os);
-    os << ")";
-  }
+
+  void print(std::ostream &os) const;
 
 public:
   /**
    * @brief Exponential Axis initialized with stepsize.
    */
-  ExpAxis(float _low, float _high, float _stepsize = 1)
-      : Axis(_low, _high, _stepsize) {}
+  ExpAxis(float _low, float _high, float _stepsize = 1);
 
   /**
    * @brief Exponential Axis initialized with number of nodes.
    */
-  ExpAxis(float _low, float _high, size_t _nodes) : Axis(_low, _high, 0.f) {
-    stepsize = std::log(high / low) / (_nodes - 1);
-  }
+  ExpAxis(float _low, float _high, size_t _nodes);
 
-  inline float transform(float x) const noexcept final {
-    return std::log(x / low) / stepsize;
-  }
-
-  inline float back_transform(float x) const noexcept final {
-    return low * std::exp(x * stepsize);
-  }
-
-  float derive(float x) const final { return (x * stepsize); }
+  float transform(float x) const noexcept final;
+  float back_transform(float x) const noexcept final;
+  float derive(float x) const final;
 };
+} // namespace cubic_splines
 
-std::ostream &operator<<(std::ostream &out, const Axis &axis) {
-  axis.print(out);
-  return out;
-}
+namespace cubic_splines {
+/**
+ * @brief Linear axis to describe data which varify not to much in orders of
+ * magnitudes. It's the fastest axis evaluation.
+ */
+class LinAxis : public Axis {
+
+  void print(std::ostream &os) const;
+
+public:
+  /**
+   * @brief Linear Axis initalized with stepsize.
+   */
+  LinAxis(float _low, float _high, float _stepsize);
+
+  /**
+   * @brief Linear Axis with number of nodes.
+   */
+  LinAxis(float _low, float _high, size_t _nodes);
+
+  float transform(float x) const noexcept final;
+  float back_transform(float x) const noexcept final;
+  float derive(float) const final;
+};
+} // namespace cubic_splines

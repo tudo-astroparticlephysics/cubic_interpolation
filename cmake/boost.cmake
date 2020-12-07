@@ -69,13 +69,13 @@ foreach(flag IN LISTS BOOST_FLAGS)
 endforeach()
 
 execute_process(
-    COMMAND ./b2 install ${BUILD_FLAGS} --prefix=${boost_BINARY_DIR}
+    COMMAND ./b2 install ${BUILD_FLAGS} --prefix=${CMAKE_INSTALL_PREFIX}
     WORKING_DIRECTORY ${boost_SOURCE_DIR}
     )
 
-set(BOOST_ROOT ${boost_BINARY_DIR} CACHE PATH "Preferred Boost installation prefix")
-set(BOOST_INCLUDEDIR ${boost_BINARY_DIR}/include CACHE PATH "Preferred Boost include directory")
-set(BOOST_LIBRARYDIR ${boost_BINARY_DIR}/lib CACHE PATH "Preferred Boost library directory ")
+set(BOOST_ROOT ${CMAKE_INSTALL_PREFIX} CACHE PATH "Preferred Boost installation prefix")
+set(BOOST_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Preferred Boost include directory")
+set(BOOST_LIBRARYDIR ${CMAKE_INSTALL_LIBDIR} PATH "Preferred Boost library directory ")
 
 find_package(Boost 1.58.0 REQUIRED QUIET COMPONENTS ${BOOST_LIBS})
 

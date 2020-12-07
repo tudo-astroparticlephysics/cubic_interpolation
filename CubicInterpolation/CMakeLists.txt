@@ -1,22 +1,17 @@
-add_library(CubicInterpolation INTERFACE)
+add_subdirectory(details)
 
-target_include_directories(CubicInterpolation INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    ${Boost_INCLUDE_DIRS}
+set(CUBIC_INTERPOLATION_HEADERS
+    Axis.h
+    BicubicSplines.h
+    CubicSplines.h
+    Interpolant.h
+    InterpolantBuilder.h
     )
 
-target_link_libraries (
-    CubicInterpolation
-    INTERFACE
-    Eigen3::Eigen
-    Boost::serialization
-    Boost::filesystem
+target_include_directories(CubicInterpolation
+    PRIVATE
+        ${Boost_INCLUDE_DIRS}
     )
 
-
-install(TARGETS CubicInterpolation
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
+install(FILES ${CUBIC_INTERPOLATION_HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/CubicInterpolation")
