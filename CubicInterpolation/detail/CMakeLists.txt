@@ -6,6 +6,10 @@ set(CUBIC_INTERPOLATION_SRC
     Interpolant.cxx
     )
 
+set(CUBIC_INTERPOLATION_HEADERS
+    Interpolant.hpp
+    )
+
 target_sources(CubicInterpolation PRIVATE ${CUBIC_INTERPOLATION_SRC})
 
 target_include_directories(CubicInterpolation PUBLIC
@@ -19,3 +23,6 @@ target_link_libraries(CubicInterpolation
         Boost::serialization
         Boost::filesystem
     )
+
+install(FILES ${CUBIC_INTERPOLATION_HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/CubicInterpolation/detail/")

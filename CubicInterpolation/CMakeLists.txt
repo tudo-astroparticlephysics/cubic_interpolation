@@ -1,4 +1,4 @@
-add_subdirectory(details)
+add_subdirectory(detail)
 
 set(CUBIC_INTERPOLATION_HEADERS
     Axis.h

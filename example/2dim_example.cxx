@@ -1,11 +1,10 @@
-#include <array>
-#include <string>
 #include <iostream>
 #include <memory>
+#include <string>
 
+#include "CubicInterpolation/Axis.h"
 #include "CubicInterpolation/BicubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
-#include "CubicInterpolation/Axis.h"
 
 float func(float x_1, float x_2) { return x_1 * x_1 + x_2 * x_2 + x_1 * x_2; }
 
@@ -24,7 +23,8 @@ int main(int argc, char *argv[]) {
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(-1, 1, (size_t)11);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(-1, 1, (size_t)11);
 
-  auto inter = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
+  auto inter =
+      cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "/tmp", "interpolant.txt");
 
   auto point = std::array<float, 2>{std::stof(argv[1]), std::stof(argv[2])};
   auto res = inter.evaluate(point);

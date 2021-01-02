@@ -12,17 +12,17 @@
 std::random_device rd;
 std::mt19937 gen(rd());
 
-TEST(CubicSplines, Constructor) {
-  auto splineI = cubic_splines::CubicSplines(std::array<float, 5>{1, 2, 3, 4, 5}, 0, 0);
-  auto splineII = cubic_splines::CubicSplines(std::vector<float>{1, 2, 3, 4, 5}, 0, 0);
-  try {
-    auto splineIII = cubic_splines::CubicSplines(std::vector<float>{1, 2}, 0, 0);
-  } catch (std::exception const &ex) {
-    EXPECT_STREQ(
-        ex.what(),
-        "Interpolation using a cubic b spline requires at least 3 points.\n");
-  }
-}
+/* TEST(CubicSplines, Constructor) { */
+/*   auto splineI = cubic_splines::CubicSplines(std::array<float, 5>{1, 2, 3, 4, 5}, 0, 0); */
+/*   auto splineII = cubic_splines::CubicSplines(std::vector<float>{1, 2, 3, 4, 5}, 0, 0); */
+/*   try { */
+/*     auto splineIII = cubic_splines::CubicSplines(std::vector<float>{1, 2}, 0, 0); */
+/*   } catch (std::exception const &ex) { */
+/*     EXPECT_STREQ( */
+/*         ex.what(), */
+/*         "Interpolation using a cubic b spline requires at least 3 points.\n"); */
+/*   } */
+/* } */
 
 TEST(CubicSplines, evaluate_cubic_polynom) {
   size_t N = 5;
@@ -140,6 +140,7 @@ TEST(CubicSplines, prime_trafo) {
   std::uniform_real_distribution<float> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
+    EXPECT_NEAR(df_dx(x), spline.prime(x), std::abs(func(x)) * 1e-2);
     EXPECT_NEAR(df_dx(x), spline.prime(x), std::abs(func(x)) * 1e-2);
   }
 }
