@@ -1,17 +1,17 @@
 language: cpp
 
-cache:
-    directories:
-        - build
-        - bin
-        - share
+# cache:
+#     directories:
+#         - build
+#         - bin
+#         - share
 
 
 beforce_cache:
     - cd build && rm -rf -- !(_deps)
 
 env:
-    - BOOST_ROOT=build/_deps/boost-build Eigen3_DIR=build/_deps/eigen3-build
+    - BOOST_ROOT=/usr/local Eigen3_DIR=build/_deps/eigen3-build
 
 before_install:
     - if [[ ! -e bin/cmake || ! -d share/cmake-3.19 ]];
@@ -21,7 +21,7 @@ before_install:
       fi
 
 install:
-    - bin/cmake -B build . -DCMAKE_BUILD_TYPE=RELEASE
-    - make -C build -j
+    - sudo bin/cmake -B build . -DCMAKE_BUILD_TYPE=RELEASE
+    - sudo make -C build -j
 
-script: make -C build test
+script: sudo make -C build test

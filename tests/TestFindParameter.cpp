@@ -1,4 +1,5 @@
 #include "CubicInterpolation/Axis.h"
+#include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/BicubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
 #include "gtest/gtest.h"
