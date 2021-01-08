@@ -5,6 +5,7 @@
 #include <boost/math/differentiation/finite_difference.hpp>
 #include <boost/serialization/access.hpp>
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 namespace cubic_splines {
@@ -32,25 +33,31 @@ auto exponent_vector(float x) {
 
 struct BicubicSplines::RuntimeData {
   ::Eigen::MatrixXf y, dydx1, dydx2, d2ydx1dx2;
-  ::Eigen::Matrix4f m = (::Eigen::Matrix4f() << 1, 0, -3, 2, 0, 0, 3, -2, 0, 1,
-                         -2, 1, 0, 0, -1, 1)
-                            .finished();
+  ::Eigen::Matrix4f m =
+      (::Eigen::Matrix4f() << 1, 0, -3, 2, 0, 0, 3, -2, 0, 1, -2, 1, 0, 0, -1, 1)
+          .finished();
 
   RuntimeData() = default;
 
   RuntimeData(size_t n1, size_t n2)
       : y(n1, n2), dydx1(n1, n2), dydx2(n1, n2), d2ydx1dx2(n1, n2){};
 
-  RuntimeData(::Eigen::MatrixXf _y, ::Eigen::MatrixXf _dydx1,
-              ::Eigen::MatrixXf _dydx2, ::Eigen::MatrixXf _d2ydx1dx2)
-      : y(std::move(_y)), dydx1(std::move(_dydx1)), dydx2(std::move(_dydx2)),
-        d2ydx1dx2(std::move(_d2ydx1dx2)){};
+  template <typename T>
+  RuntimeData(T &&_y, T &&_dydx1, T &&_dydx2, T &&_d2ydx1dx2)
+      : y(std::forward<T>(_y)), dydx1(std::forward<T>(_dydx1)),
+        dydx2(std::forward<T>(_dydx2)), d2ydx1dx2(std::forward<T>(_d2ydx1dx2)){};
+
+  template <typename T> inline auto to_vector(T m) const {
+    return ::std::vector<float>(m.data(), m.data() + m.rows() * m.cols());
+  }
+
+  auto get_dimensions() const { return std::array<long int, 2>{y.rows(), y.cols()}; }
 
   StorageData to_storage_data() const;
 };
 
 class BicubicSplines::StorageData {
-  ::std::array<size_t, 2> size;
+  ::std::array<long int, 2> size;
   ::std::vector<float> y, dydx1, dydx2, d2ydx1dx2;
 
   friend class boost::serialization::access;
@@ -62,39 +69,29 @@ class BicubicSplines::StorageData {
     ar &d2ydx1dx2;
   }
 
-  template <typename M, typename S> inline auto to_vector(M m, S s) {
-    return ::std::vector<float>(m.data(), m.data() + s[0] * s[1]);
-  }
-
-  template <typename V, typename S> inline auto to_matrix(V v, S s) {
-    return ::Eigen::Map<::Eigen::MatrixXf>(v.data(), s[0], s[1]);
+  template <typename V> inline auto to_matrix(V v) const {
+    return ::Eigen::Map<::Eigen::MatrixXf>(v.data(), size[0], size[1]);
   }
 
 public:
   StorageData() = default;
-  using matrix_t =
-      ::std::decay<decltype(BicubicSplines::RuntimeData().y)>::type;
-  StorageData(matrix_t _y, matrix_t _dydx1, matrix_t _dydx2,
-              matrix_t _d2ydx1dx2)
-      : size({(size_t)_y.rows(), (size_t)_y.cols()}), y(to_vector(_y, size)),
-        dydx1(to_vector(_dydx1, size)), dydx2(to_vector(_dydx2, size)),
-        d2ydx1dx2(to_vector(_d2ydx1dx2, size)){};
 
-  auto to_runtime_data() {
-    return RuntimeData{to_matrix(y, size), to_matrix(dydx1, size),
-                       to_matrix(dydx2, size), to_matrix(d2ydx1dx2, size)};
+  template <typename T>
+  StorageData(std::array<long int, 2> _size, T &&_y, T &&_dydx1, T &&_dydx2,
+              T &&_d2ydx1dx2)
+      : size(std::move(_size)), y(std::forward<T>(_y)), dydx1(std::forward<T>(_dydx1)),
+        dydx2(std::forward<T>(_dydx2)), d2ydx1dx2(std::forward<T>(_d2ydx1dx2)){};
+
+  auto to_runtime_data() const {
+    return RuntimeData(to_matrix(y), to_matrix(dydx1), to_matrix(dydx2),
+                       to_matrix(d2ydx1dx2));
   }
 };
 
-BicubicSplines::StorageData
-BicubicSplines::RuntimeData::to_storage_data() const {
-  return StorageData(y, dydx1, dydx2, d2ydx1dx2);
+BicubicSplines::StorageData BicubicSplines::RuntimeData::to_storage_data() const {
+  return StorageData(get_dimensions(), to_vector(y), to_vector(dydx1), to_vector(dydx2),
+                     to_vector(d2ydx1dx2));
 }
-
-/* BicubicSplines &BicubicSplines::operator=(BicubicSplines const &splines) { */
-/*   data = std::make_unique<RuntimeData>(*splines.data); */
-/*   return *this; */
-/* } */
 
 BicubicSplines::BicubicSplines(BicubicSplines::RuntimeData _data)
     : data(::std::make_unique<BicubicSplines::RuntimeData>(_data)) {}
@@ -113,7 +110,7 @@ BicubicSplines::BicubicSplines(Definition const &def, std::string path,
 }
 
 BicubicSplines::BicubicSplines(Definition const &def)
-    : data(std::make_unique<RuntimeData>(def.axis[0]->required_nodes(),
+    : data(std::make_shared<RuntimeData>(def.axis[0]->required_nodes(),
                                          def.axis[1]->required_nodes())) {
   using boost::math::differentiation::finite_difference_derivative;
   auto func = [&def](float x1, float x2) {
@@ -128,31 +125,26 @@ BicubicSplines::BicubicSplines(Definition const &def)
       auto dfdx1 = def.axis[0]->derive(x1);
       auto dfdx2 = def.axis[1]->derive(x2);
       data->y(n1, n2) = func(x1, x2);
-      data->dydx1(n1, n2) =
-          finite_difference_derivative(
-              [this, &func, x2](float x) { return func(x, x2); }, x1) *
-          dfdx1;
-      data->dydx2(n1, n2) =
-          finite_difference_derivative(
-              [this, &func, x1](float x) { return func(x1, x); }, x2) *
-          dfdx2;
-      data->d2ydx1dx2(n1, n2) =
-          finite_difference_derivative(
-              [this, &func, x1, x2, dfdx1, dfdx2](float x_1) {
-                return finite_difference_derivative(
-                           [this, &func, x_1, dfdx2](float x_2) {
-                             return func(x_1, x_2);
-                           },
-                           x2) *
-                       dfdx2;
-              },
-              x1) *
-          dfdx1;
+      data->dydx1(n1, n2) = finite_difference_derivative(
+                                [this, &func, x2](float x) { return func(x, x2); }, x1) *
+                            dfdx1;
+      data->dydx2(n1, n2) = finite_difference_derivative(
+                                [this, &func, x1](float x) { return func(x1, x); }, x2) *
+                            dfdx2;
+      data->d2ydx1dx2(n1, n2) = finite_difference_derivative(
+                                    [this, &func, x1, x2, dfdx1, dfdx2](float x_1) {
+                                      return finite_difference_derivative(
+                                                 [this, &func, x_1, dfdx2](float x_2) {
+                                                   return func(x_1, x_2);
+                                                 },
+                                                 x2) *
+                                             dfdx2;
+                                    },
+                                    x1) *
+                                dfdx1;
     }
   }
 }
-
-/* BicubicSplines::~BicubicSplines() {} */
 
 float BicubicSplines::evaluate(float x0, float x1) const {
   auto n0 = detail::calculate_node(x0, data->y.cols());
