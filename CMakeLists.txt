@@ -34,6 +34,11 @@ target_include_directories(CubicInterpolation INTERFACE
     $<INSTALL_INTERFACE:include/CubicInterpolation>
     )
 
+
+set_target_properties(CubicInterpolation PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
 install(TARGETS CubicInterpolation EXPORT CubicInterpolationTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
