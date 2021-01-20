@@ -4,8 +4,8 @@
 
 namespace cubic_splines {
 namespace detail {
-float _find_parameter(std::function<float(float)> const &f,
-                      std::function<float(float)> const &df, float x,
+double _find_parameter(std::function<double(double)> const &f,
+                      std::function<double(double)> const &df, double x,
                       Axis const &axis) {
   auto low = axis.GetLow();
   auto high = axis.GetHigh();

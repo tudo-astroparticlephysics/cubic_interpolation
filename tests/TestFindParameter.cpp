@@ -12,13 +12,13 @@ std::mt19937 gen(rd());
 
 TEST(find_parameter, CubicSplines) {
   constexpr static size_t N = 100;
-  auto func = [](float x) { return x * x * x ; };
+  auto func = [](double x) { return x * x * x ; };
   auto def = cubic_splines::CubicSplines::Definition();
   def.f = func;
   auto xaxis = cubic_splines::LinAxis(-1, 1, N);
   def.axis = std::make_unique<cubic_splines::LinAxis>(xaxis);
   auto spline = cubic_splines::Interpolant<cubic_splines::CubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(0, N-1);
+  std::uniform_real_distribution<double> dis(0, N-1);
   for (int i = 0; i < 10'000; ++i) {
     auto x = xaxis.back_transform(dis(gen));
     auto f = func(x);
@@ -30,7 +30,7 @@ TEST(find_parameter, CubicSplines) {
 
 TEST(find_parameter, BicubicSplines) {
   constexpr static size_t N = 100;
-  auto func = [](float x1, float x2) { return x1 * x1 + x2; };
+  auto func = [](double x1, double x2) { return x1 * x1 + x2; };
   auto def = cubic_splines::BicubicSplines::Definition();
   def.f = func;
   def.f_trafo = std::make_unique<cubic_splines::ExpAxis>(1, 0);
@@ -39,13 +39,13 @@ TEST(find_parameter, BicubicSplines) {
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(xaxis);
   def.axis[1] = std::make_unique<cubic_splines::ExpAxis>(yaxis);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(0, N-1);
+  std::uniform_real_distribution<double> dis(0, N-1);
   for (int i = 0; i < 10'000; ++i) {
     auto x = xaxis.back_transform(dis(gen));
     auto y = yaxis.back_transform(dis(gen));
     auto f = func(x, y);
     // search y falue for given f, x value.
-    auto y_guess = cubic_splines::find_parameter(spline, f, std::array<float, 2>{x, 0.5f}, 1);
+    auto y_guess = cubic_splines::find_parameter(spline, f, std::array<double, 2>{x, 0.5f}, 1);
     EXPECT_NEAR(y, y_guess, std::max(std::abs(y) * 1e-2, 1e-3));
   }
 }

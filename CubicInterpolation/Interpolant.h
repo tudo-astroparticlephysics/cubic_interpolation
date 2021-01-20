@@ -40,7 +40,7 @@ public:
   /**
    * @brief Evaluation of the interpolant, takeing axis and function value
    * trafo into account. If a one dimensional interpolant is evaluated, a
-   * floatingpoint is required. Otherwise a iterable container with values
+   * doubleingpoint is required. Otherwise a iterable container with values
    * stored in same order as axis is required.
    */
   template <typename T> inline auto evaluate(T x) const {
@@ -51,7 +51,7 @@ public:
   /**
    * @brief First derive of the interpolant, takeing axis and function value
    * trafo into account. If a one dimensional interpolant is evaluated, a
-   * floatingpoint is required. Otherwise a iterable container with values
+   * doubleingpoint is required. Otherwise a iterable container with values
    * stored in same order as axis is required.
    */
   template <typename T> inline auto prime(T x) const {
@@ -72,7 +72,7 @@ public:
  *
  * @param interpolant interpolant object required for calculation
  * @param val function value
- * @param x floating point with initial guess if 1 dimensional, else iterable
+ * @param x doubleing point with initial guess if 1 dimensional, else iterable
  * container with ordered function values and in place guess for to estimate
  * variable
  * @param n if multidimensional interpolant, number which variable to estimate

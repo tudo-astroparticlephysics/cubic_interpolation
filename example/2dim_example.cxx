@@ -6,7 +6,7 @@
 #include "CubicInterpolation/BicubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
 
-float func(float x_1, float x_2) { return x_1 * x_1 + x_2 * x_2 + x_1 * x_2; }
+double func(double x_1, double x_2) { return x_1 * x_1 + x_2 * x_2 + x_1 * x_2; }
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   auto inter =
       cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "/tmp", "interpolant.txt");
 
-  auto point = std::array<float, 2>{std::stof(argv[1]), std::stof(argv[2])};
+  auto point = std::array<double, 2>{std::stof(argv[1]), std::stof(argv[2])};
   auto res = inter.evaluate(point);
 
   std::cout << "f(" << point[0] << ", " << point[1] << "): " << res

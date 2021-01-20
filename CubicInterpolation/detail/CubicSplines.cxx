@@ -13,9 +13,9 @@ namespace cubic_splines {
  * After reading and writing the object will be destructed.
  */
 struct CubicSplines::StorageData {
-  std::vector<float> y;
-  float lower_lim_derivate;
-  float upper_lim_derivate;
+  std::vector<double> y;
+  double lower_lim_derivate;
+  double upper_lim_derivate;
 
   friend class boost::serialization::access;
   template <class Archive> void serialize(Archive &ar, const unsigned int) { ar &y; };
@@ -24,7 +24,7 @@ public:
   StorageData() = default;
 
   template <typename T>
-  StorageData(T const &_y, float _lower_lim_derivate, float _upper_lim_derivate)
+  StorageData(T const &_y, double _lower_lim_derivate, double _upper_lim_derivate)
       : y(_y.begin(), _y.end()), lower_lim_derivate(_lower_lim_derivate),
         upper_lim_derivate(_upper_lim_derivate){};
 
@@ -33,12 +33,12 @@ public:
 
 struct CubicSplines::RuntimeData : public CubicSplines::StorageData {
 
-  boost::math::interpolators::cardinal_cubic_b_spline<float> spline;
+  boost::math::interpolators::cardinal_cubic_b_spline<double> spline;
 
   RuntimeData() = default;
 
   template <typename T>
-  RuntimeData(T _data, float _lower_lim_derivate, float _upper_lim_derivate)
+  RuntimeData(T _data, double _lower_lim_derivate, double _upper_lim_derivate)
       : StorageData(_data, _lower_lim_derivate, _upper_lim_derivate),
         spline(y.data(), y.size(), 0, 1, lower_lim_derivate, upper_lim_derivate) {}
 
@@ -68,8 +68,8 @@ CubicSplines::CubicSplines(Definition const &def, std::string path,
 CubicSplines::CubicSplines(Definition const &def)
     : data(::std::make_unique<CubicSplines::RuntimeData>()) {
   using boost::math::differentiation::finite_difference_derivative;
-  auto y = std::vector<float>(def.axis->required_nodes());
-  auto func = [&def](float x) {
+  auto y = std::vector<double>(def.axis->required_nodes());
+  auto func = [&def](double x) {
     auto fx = def.f(x);
     if (def.f_trafo)
       fx = def.f_trafo->transform(fx);
@@ -79,19 +79,21 @@ CubicSplines::CubicSplines(Definition const &def)
     y[n] = func(def.axis->back_transform(n));
   auto low = def.axis->back_transform(0);
   auto up = def.axis->back_transform(y.size() - 1);
-  auto lower_lim_derivate =
-      finite_difference_derivative(func, low) * def.axis->derive(low);
-  auto upper_lim_derivate =
-      finite_difference_derivative(func, def.axis->back_transform(y.size() - 1)) *
-      def.axis->derive(up);
+
+  auto lower_lim_derivate = finite_difference_derivative(func, low) * def.axis->derive(low);
+  auto upper_lim_derivate = finite_difference_derivative(func, up) * def.axis->derive(up);
+
+
   data = ::std::make_unique<CubicSplines::RuntimeData>(y, lower_lim_derivate,
                                                        upper_lim_derivate);
 }
 
-float CubicSplines::evaluate(float x) const { return data->spline(x); };
+double CubicSplines::evaluate(double x) const { return data->spline(x); };
 
-float CubicSplines::prime(float x) const { return data->spline.prime(x); };
+double CubicSplines::prime(double x) const { return data->spline.prime(x); };
 
-float CubicSplines::double_prime(float x) const { return data->spline.double_prime(x); };
+double CubicSplines::double_prime(double x) const {
+  return data->spline.double_prime(x);
+};
 
 } // namespace cubic_splines

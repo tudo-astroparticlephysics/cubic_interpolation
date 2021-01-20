@@ -13,7 +13,7 @@ std::mt19937 gen(rd());
 
 TEST(BicubicSplines, Constructor) {
   auto def = cubic_splines::BicubicSplines::Definition();
-  def.f = [](float x1, float x2) { return x1 * x1 + x2 * x2; };
+  def.f = [](double x1, double x2) { return x1 * x1 + x2 * x2; };
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(-1, 1, (size_t)10);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(-1, 1, (size_t)10);
 
@@ -25,16 +25,16 @@ TEST(BicubicSplines, evaluate_cubic_polynom) {
   auto low = -10.f;
   auto high = 10.f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) { return x1 * x1 + x2 * x2; };
+  auto func = [](double x1, double x2) { return x1 * x1 + x2 * x2; };
   def.f = func;
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<float, 2>{x, y}),
+    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<double, 2>{x, y}),
                 std::max(std::abs(func(x, y)) * 1e-3, 1e-3));
   }
 };
@@ -44,16 +44,16 @@ TEST(BicubicSplines, evaluate_absolute_value) {
   auto low = -10.f;
   auto high = 10.f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) { return std::abs(x1) + std::abs(x2); };
+  auto func = [](double x1, double x2) { return std::abs(x1) + std::abs(x2); };
   def.f = func;
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<float, 2>{x, y}),
+    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<double, 2>{x, y}),
                 std::max(std::abs(func(x, y)) * 1e-3, 5e-1));
   }
 }
@@ -63,16 +63,16 @@ TEST(BicubicSplines, evaluate_heaviside) {
   auto low = -0.1f;
   auto high = 0.1f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) { return ((x1 > 0) && (x2 > 0)); };
+  auto func = [](double x1, double x2) { return ((x1 > 0) && (x2 > 0)); };
   def.f = func;
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<float, 2>{x, y}), 1);
+    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<double, 2>{x, y}), 1);
   }
 }
 
@@ -81,16 +81,16 @@ TEST(BicubicSplines, evaluate_exp_distributed_nodes) {
   auto low = 1e-5f;
   auto high = 1e0f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) { return std::exp(x1 * x1 + x2 * x2); };
+  auto func = [](double x1, double x2) { return std::exp(x1 * x1 + x2 * x2); };
   def.f = func;
   def.axis[0] = std::make_unique<cubic_splines::ExpAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::ExpAxis>(low, high, N);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<float, 2>{x, y}), 1);
+    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<double, 2>{x, y}), 1);
   }
 }
 
@@ -99,7 +99,7 @@ TEST(BicubicSplines, evaluate_log_func_values_and_axis) {
   auto low = 1e0f;
   auto high = 1e1f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) {
+  auto func = [](double x1, double x2) {
     return std::pow(x1, 10) * std::pow(x2, 10);
   };
   def.f = func;
@@ -107,11 +107,11 @@ TEST(BicubicSplines, evaluate_log_func_values_and_axis) {
   def.axis[0] = std::make_unique<cubic_splines::ExpAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::ExpAxis>(low, high, N);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<float, 2>{x, y}),
+    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<double, 2>{x, y}),
                 std::abs(func(x, y)) * 1e-2);
   }
 }
@@ -121,22 +121,22 @@ TEST(BicubicSplines, prime) {
   auto low = 1.e0f;
   auto high = 1.e1f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) { return x1 * x1 + x2 * x2 + x1 * x2; };
-  auto df_dx = [](float x1, float x2) {
-    return std::array<float, 2>{2 * x1 + x2, 2 * x2 + x1};
+  auto func = [](double x1, double x2) { return x1 * x1 + x2 * x2 + x1 * x2; };
+  auto df_dx = [](double x1, double x2) {
+    return std::array<double, 2>{2 * x1 + x2, 2 * x2 + x1};
   };
   def.f = func;
   def.axis[0] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   auto splineI = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), splineI.evaluate(std::array<float, 2>{x, y}),
+    EXPECT_NEAR(func(x, y), splineI.evaluate(std::array<double, 2>{x, y}),
                 std::abs(func(x, y)) * 1e-2);
     auto f = df_dx(x, y);
-    auto sp = splineI.prime(std::array<float, 2>{x, y});
+    auto sp = splineI.prime(std::array<double, 2>{x, y});
     EXPECT_NEAR(f[0], sp[0], std::abs(f[0]) * 1e-2);
     EXPECT_NEAR(f[1], sp[1], std::abs(f[1]) * 1e-2);
   }
@@ -149,10 +149,10 @@ TEST(BicubicSplines, prime) {
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), splineII.evaluate(std::array<float, 2>{x, y}),
+    EXPECT_NEAR(func(x, y), splineII.evaluate(std::array<double, 2>{x, y}),
                 std::abs(func(x, y)) * 1e-2);
     auto f = df_dx(x, y);
-    auto sp = splineII.prime(std::array<float, 2>{x, y});
+    auto sp = splineII.prime(std::array<double, 2>{x, y});
     EXPECT_NEAR(f[0], sp[0], std::abs(f[0]) * 1e-2);
     EXPECT_NEAR(f[1], sp[1], std::abs(f[1]) * 1e-2);
   }
@@ -163,23 +163,23 @@ TEST(BicubicSplines, prime_trafo) {
   auto low = 1.e0f;
   auto high = 1.e1f;
   auto def = cubic_splines::BicubicSplines::Definition();
-  auto func = [](float x1, float x2) { return x1 * x1 + x2 * x2 + x1 * x2; };
-  auto df_dx = [](float x1, float x2) {
-    return std::array<float, 2>{2 * x1 + x2, 2 * x2 + x1};
+  auto func = [](double x1, double x2) { return x1 * x1 + x2 * x2 + x1 * x2; };
+  auto df_dx = [](double x1, double x2) {
+    return std::array<double, 2>{2 * x1 + x2, 2 * x2 + x1};
   };
   def.f = func;
   def.f_trafo = std::make_unique<cubic_splines::ExpAxis>(1, 0);
   def.axis[0] = std::make_unique<cubic_splines::ExpAxis>(low, high, N);
   def.axis[1] = std::make_unique<cubic_splines::LinAxis>(low, high, N);
   auto spline = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "", "");
-  std::uniform_real_distribution<float> dis(low, high);
+  std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
     auto y = dis(gen);
-    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<float, 2>{x, y}),
+    EXPECT_NEAR(func(x, y), spline.evaluate(std::array<double, 2>{x, y}),
                 std::abs(func(x, y)) * 1e-2);
     auto f = df_dx(x, y);
-    auto sp = spline.prime(std::array<float, 2>{x, y});
+    auto sp = spline.prime(std::array<double, 2>{x, y});
     EXPECT_NEAR(f[0], sp[0], std::abs(f[0]) * 1e-2);
     EXPECT_NEAR(f[1], sp[1], std::abs(f[1]) * 1e-2);
   }

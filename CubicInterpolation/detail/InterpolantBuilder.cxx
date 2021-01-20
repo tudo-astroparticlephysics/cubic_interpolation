@@ -24,7 +24,7 @@ namespace cubic_splines {
 /*   auto dydx1 = Eigen::MatrixXf(x1nodes, x2nodes); */
 /*   auto dydx2 = Eigen::MatrixXf(x1nodes, x2nodes); */
 /*   auto d2ydx1dx2 = Eigen::MatrixXf(x1nodes, x2nodes); */
-/*   auto func = [this, &def](float x1, float x2) { */
+/*   auto func = [this, &def](double x1, double x2) { */
 /*     return transform(def, x1, x2); */
 /*   }; */
 /*   for (size_t n1 = 0; n1 < x1nodes; ++n1) { */
@@ -38,17 +38,17 @@ namespace cubic_splines {
 /*       y(n1, n2) = func(x1, x2); */
 /*       dydx1(n1, n2) = */
 /*           finite_difference_derivative( */
-/*               [this, &func, x2](float x) { return func(x, x2); }, x1) * */
+/*               [this, &func, x2](double x) { return func(x, x2); }, x1) * */
 /*           dfdx1; */
 /*       dydx2(n1, n2) = */
 /*           finite_difference_derivative( */
-/*               [this, &func, x1](float x) { return func(x1, x); }, x2) * */
+/*               [this, &func, x1](double x) { return func(x1, x); }, x2) * */
 /*           dfdx2; */
 /*       d2ydx1dx2(n1, n2) = */
 /*           finite_difference_derivative( */
-/*               [this, &func, x1, x2, dfdx1, dfdx2](float x_1) { */
+/*               [this, &func, x1, x2, dfdx1, dfdx2](double x_1) { */
 /*                 return finite_difference_derivative( */
-/*                            [this, &func, x_1, dfdx2](float x_2) { */
+/*                            [this, &func, x_1, dfdx2](double x_2) { */
 /*                              return func(x_1, x_2); */
 /*                            }, */
 /*                            x2) * */
@@ -76,9 +76,9 @@ namespace cubic_splines {
 /*     if (ex.code().value() != ENOENT) */
 /*       throw ex; */
 /*   } */
-/*   auto y = std::vector<float>(def.axis->required_nodes()); */
+/*   auto y = std::vector<double>(def.axis->required_nodes()); */
 /*   auto func = [this, &def](double x) { return transform(def, x); }; */
-/*   /1* auto func = [&def](float x) { *1/ */
+/*   /1* auto func = [&def](double x) { *1/ */
 /*   /1*   auto fx = def.f(x); *1/ */
 /*   /1*   if (def.f_trafo) *1/ */
 /*   /1*     fx = def.f_trafo->transform(fx); *1/ */

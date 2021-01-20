@@ -10,7 +10,7 @@
 
 namespace cubic_splines {
 namespace detail {
-unsigned int calculate_node(float val, unsigned int n_max) {
+unsigned int calculate_node(double val, unsigned int n_max) {
   auto n = std::floor(val);
   if (n < 0) {
     return 0;
@@ -20,8 +20,8 @@ unsigned int calculate_node(float val, unsigned int n_max) {
   return n;
 }
 
-auto exponent_vector(float x) {
-  auto x_vec = ::Eigen::Vector4f(4);
+auto exponent_vector(double x) {
+  auto x_vec = ::Eigen::Vector4d(4);
   for (size_t i = 0; i < 4; ++i) {
     x_vec(i) = 1;
     for (size_t j = 1; j <= i; ++j)
@@ -32,9 +32,9 @@ auto exponent_vector(float x) {
 } // namespace detail
 
 struct BicubicSplines::RuntimeData {
-  ::Eigen::MatrixXf y, dydx1, dydx2, d2ydx1dx2;
-  ::Eigen::Matrix4f m =
-      (::Eigen::Matrix4f() << 1, 0, -3, 2, 0, 0, 3, -2, 0, 1, -2, 1, 0, 0, -1, 1)
+  ::Eigen::MatrixXd y, dydx1, dydx2, d2ydx1dx2;
+  ::Eigen::Matrix4d m =
+      (::Eigen::Matrix4d() << 1, 0, -3, 2, 0, 0, 3, -2, 0, 1, -2, 1, 0, 0, -1, 1)
           .finished();
 
   RuntimeData() = default;
@@ -48,7 +48,7 @@ struct BicubicSplines::RuntimeData {
         dydx2(std::forward<T>(_dydx2)), d2ydx1dx2(std::forward<T>(_d2ydx1dx2)){};
 
   template <typename T> inline auto to_vector(T m) const {
-    return ::std::vector<float>(m.data(), m.data() + m.rows() * m.cols());
+    return ::std::vector<double>(m.data(), m.data() + m.rows() * m.cols());
   }
 
   auto get_dimensions() const { return std::array<long int, 2>{y.rows(), y.cols()}; }
@@ -58,7 +58,7 @@ struct BicubicSplines::RuntimeData {
 
 class BicubicSplines::StorageData {
   ::std::array<long int, 2> size;
-  ::std::vector<float> y, dydx1, dydx2, d2ydx1dx2;
+  ::std::vector<double> y, dydx1, dydx2, d2ydx1dx2;
 
   friend class boost::serialization::access;
   template <class Archive> void serialize(Archive &ar, const unsigned int) {
@@ -70,7 +70,7 @@ class BicubicSplines::StorageData {
   }
 
   template <typename V> inline auto to_matrix(V v) const {
-    return ::Eigen::Map<::Eigen::MatrixXf>(v.data(), size[0], size[1]);
+    return ::Eigen::Map<::Eigen::MatrixXd>(v.data(), size[0], size[1]);
   }
 
 public:
@@ -113,7 +113,7 @@ BicubicSplines::BicubicSplines(Definition const &def)
     : data(std::make_shared<RuntimeData>(def.axis[0]->required_nodes(),
                                          def.axis[1]->required_nodes())) {
   using boost::math::differentiation::finite_difference_derivative;
-  auto func = [&def](float x1, float x2) {
+  auto func = [&def](double x1, double x2) {
     if (def.f_trafo)
       return def.f_trafo->transform(def.f(x1, x2));
     return def.f(x1, x2);
@@ -126,15 +126,15 @@ BicubicSplines::BicubicSplines(Definition const &def)
       auto dfdx2 = def.axis[1]->derive(x2);
       data->y(n1, n2) = func(x1, x2);
       data->dydx1(n1, n2) = finite_difference_derivative(
-                                [this, &func, x2](float x) { return func(x, x2); }, x1) *
+                                [this, &func, x2](double x) { return func(x, x2); }, x1) *
                             dfdx1;
       data->dydx2(n1, n2) = finite_difference_derivative(
-                                [this, &func, x1](float x) { return func(x1, x); }, x2) *
+                                [this, &func, x1](double x) { return func(x1, x); }, x2) *
                             dfdx2;
       data->d2ydx1dx2(n1, n2) = finite_difference_derivative(
-                                    [this, &func, x1, x2, dfdx1, dfdx2](float x_1) {
+                                    [this, &func, x1, x2, dfdx1, dfdx2](double x_1) {
                                       return finite_difference_derivative(
-                                                 [this, &func, x_1, dfdx2](float x_2) {
+                                                 [this, &func, x_1, dfdx2](double x_2) {
                                                    return func(x_1, x_2);
                                                  },
                                                  x2) *
@@ -146,10 +146,10 @@ BicubicSplines::BicubicSplines(Definition const &def)
   }
 }
 
-float BicubicSplines::evaluate(float x0, float x1) const {
+double BicubicSplines::evaluate(double x0, double x1) const {
   auto n0 = detail::calculate_node(x0, data->y.cols());
   auto n1 = detail::calculate_node(x1, data->y.rows());
-  auto temp = Eigen::Matrix4f(4, 4);
+  auto temp = Eigen::Matrix4d(4, 4);
   temp.block<2, 2>(0, 0) = data->y.block(n0, n1, 2, 2);
   temp.block<2, 2>(2, 0) = data->dydx1.block(n0, n1, 2, 2);
   temp.block<2, 2>(0, 2) = data->dydx2.block(n0, n1, 2, 2);
@@ -159,22 +159,22 @@ float BicubicSplines::evaluate(float x0, float x1) const {
   return v1.dot((data->m.transpose() * (temp * data->m)) * v2);
 }
 
-std::array<float, 2> BicubicSplines::prime(float x0, float x1) const {
+std::array<double, 2> BicubicSplines::prime(double x0, double x1) const {
   using boost::math::differentiation::finite_difference_derivative;
-  auto grad = std::array<float, 2>();
+  auto grad = std::array<double, 2>();
   grad[0] = finite_difference_derivative(
-      [this, x1](float x_0) { return evaluate(x_0, x1); }, x0);
+      [this, x1](double x_0) { return evaluate(x_0, x1); }, x0);
   grad[1] = finite_difference_derivative(
-      [this, x0](float x_1) { return evaluate(x0, x_1); }, x1);
+      [this, x0](double x_1) { return evaluate(x0, x_1); }, x1);
   return grad;
 }
 
-float BicubicSplines::double_prime(float x0, float x1) const {
+double BicubicSplines::double_prime(double x0, double x1) const {
   using boost::math::differentiation::finite_difference_derivative;
   return finite_difference_derivative(
-      [this, x0, x1](float x_1) {
+      [this, x0, x1](double x_1) {
         return finite_difference_derivative(
-            [this, x1, x_1](float x_2) { return evaluate(x_1, x_2); }, x1);
+            [this, x1, x_1](double x_2) { return evaluate(x_1, x_2); }, x1);
       },
       x0);
 }

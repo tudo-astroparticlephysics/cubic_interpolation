@@ -8,7 +8,7 @@ void Axis::print(std::ostream &os) const {
   os << "low: " << low << ", high: " << high << ", stepsize: " << stepsize;
 };
 
-Axis::Axis(float _low, float _high, float _stepsize)
+Axis::Axis(double _low, double _high, double _stepsize)
     : low(_low), high(_high), stepsize(_stepsize) {}
 
 size_t Axis::required_nodes() const {
@@ -29,26 +29,26 @@ void ExpAxis::print(std::ostream &os) const {
   os << ")";
 }
 
-ExpAxis::ExpAxis(float _low, float _high, float _stepsize)
+ExpAxis::ExpAxis(double _low, double _high, double _stepsize)
     : Axis(_low, _high, _stepsize) {}
 
 /**
  * @brief Exponential Axis initialized with number of nodes.
  */
-ExpAxis::ExpAxis(float _low, float _high, size_t _nodes)
+ExpAxis::ExpAxis(double _low, double _high, size_t _nodes)
     : Axis(_low, _high, 0.f) {
   stepsize = std::log(high / low) / (_nodes - 1);
 }
 
-float ExpAxis::transform(float x) const noexcept {
+double ExpAxis::transform(double x) const noexcept {
   return std::log(x / low) / stepsize;
 }
 
-float ExpAxis::back_transform(float x) const noexcept {
+double ExpAxis::back_transform(double x) const noexcept {
   return low * std::exp(x * stepsize);
 }
 
-float ExpAxis::derive(float x) const { return (x * stepsize); }
+double ExpAxis::derive(double x) const { return (x * stepsize); }
 
 void LinAxis::print(std::ostream &os) const {
   os << "LinAxis(";
@@ -56,22 +56,22 @@ void LinAxis::print(std::ostream &os) const {
   os << ")";
 }
 
-LinAxis::LinAxis(float _low, float _high, float _stepsize)
+LinAxis::LinAxis(double _low, double _high, double _stepsize)
     : Axis(_low, _high, _stepsize) {}
 
-LinAxis::LinAxis(float _low, float _high, size_t _nodes)
+LinAxis::LinAxis(double _low, double _high, size_t _nodes)
     : Axis(_low, _high, 0.f) {
   stepsize = (high - low) / (_nodes - 1);
 }
 
-float LinAxis::transform(float x) const noexcept {
+double LinAxis::transform(double x) const noexcept {
   return (x - low) / stepsize;
 }
 
-float LinAxis::back_transform(float x) const noexcept {
+double LinAxis::back_transform(double x) const noexcept {
   return x * stepsize + low;
 }
 
-float LinAxis::derive(float) const { return stepsize; }
+double LinAxis::derive(double) const { return stepsize; }
 
 } // namespace cubic_splines

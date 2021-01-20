@@ -6,7 +6,7 @@
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
 
-float func(float x) { return x * x + x; }
+double func(double x) { return x * x + x; }
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {

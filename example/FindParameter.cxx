@@ -7,8 +7,8 @@
 #include "CubicInterpolation/Interpolant.h"
 #include "CubicInterpolation/Axis.h"
 
-float func1dim(float x) { return x * x + x; }
-float func2dim(float x, float y) { return x * x + y * y; }
+double func1dim(double x) { return x * x + x; }
+double func2dim(double x, double y) { return x * x + y * y; }
 
 int main() {
   auto def1d = cubic_splines::CubicSplines::Definition();
@@ -32,7 +32,7 @@ int main() {
   auto y_guess = 3.f;
   auto searched_param = 1;
   auto y = cubic_splines::find_parameter(inter2d, function_value,
-                    std::array<float, 2>{x_val, y_guess}, searched_param);
+                    std::array<double, 2>{x_val, y_guess}, searched_param);
   std::cout << "f(x="<< x_val <<",y) = " << function_value << " -> y = " << y << std::endl;
   return 0;
 }

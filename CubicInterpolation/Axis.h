@@ -11,7 +11,7 @@ namespace cubic_splines {
  */
 class Axis {
 protected:
-  float low, high, stepsize;
+  double low, high, stepsize;
 
   virtual void print(std::ostream &os) const;
 
@@ -26,14 +26,14 @@ public:
    * @param _high upper limit of the axis
    * @param _stepsize stepsize in values of the transformation
    */
-  Axis(float _low, float _high, float _stepsize);
+  Axis(double _low, double _high, double _stepsize);
 
   /**
    * @brief Return the corresponding lower node which is nearest to the
    * point and manipulate the *x*-value to the relative distance from the
    * node to the next one.
    */
-  virtual float transform(float x) const noexcept = 0;
+  virtual double transform(double x) const noexcept = 0;
 
   /**
    * @brief Calculate the corresponding point to the *n*-th node. The *0*-th
@@ -41,7 +41,7 @@ public:
    * of the axis. The decimal digits specify the relative distance to the next
    * node.
    */
-  virtual float back_transform(float x) const noexcept = 0;
+  virtual double back_transform(double x) const noexcept = 0;
 
   /**
    * @brief Calculates the required number of nodes.
@@ -51,17 +51,17 @@ public:
   /**
    * @brief Lower axis limit.
    */
-  float GetLow() const noexcept { return low; }
+  double GetLow() const noexcept { return low; }
 
   /**
    * @brief Upper axis limit.
    */
-  float GetHigh() const noexcept { return high; }
+  double GetHigh() const noexcept { return high; }
 
   /**
    * @brief Derivate of the Axis forward transformation.
    */
-  virtual float derive(float x) const = 0;
+  virtual double derive(double x) const = 0;
 };
 
 std::ostream &operator<<(std::ostream &out, const Axis &axis);
@@ -81,16 +81,16 @@ public:
   /**
    * @brief Exponential Axis initialized with stepsize.
    */
-  ExpAxis(float _low, float _high, float _stepsize = 1);
+  ExpAxis(double _low, double _high, double _stepsize = 1);
 
   /**
    * @brief Exponential Axis initialized with number of nodes.
    */
-  ExpAxis(float _low, float _high, size_t _nodes);
+  ExpAxis(double _low, double _high, size_t _nodes);
 
-  float transform(float x) const noexcept final;
-  float back_transform(float x) const noexcept final;
-  float derive(float x) const final;
+  double transform(double x) const noexcept final;
+  double back_transform(double x) const noexcept final;
+  double derive(double x) const final;
 };
 } // namespace cubic_splines
 
@@ -107,15 +107,15 @@ public:
   /**
    * @brief Linear Axis initalized with stepsize.
    */
-  LinAxis(float _low, float _high, float _stepsize);
+  LinAxis(double _low, double _high, double _stepsize);
 
   /**
    * @brief Linear Axis with number of nodes.
    */
-  LinAxis(float _low, float _high, size_t _nodes);
+  LinAxis(double _low, double _high, size_t _nodes);
 
-  float transform(float x) const noexcept final;
-  float back_transform(float x) const noexcept final;
-  float derive(float) const final;
+  double transform(double x) const noexcept final;
+  double back_transform(double x) const noexcept final;
+  double derive(double) const final;
 };
 } // namespace cubic_splines

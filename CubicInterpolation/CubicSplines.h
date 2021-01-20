@@ -25,7 +25,7 @@ public:
    * @brief Properties of an *1-dim* interpolation object.
    */
   struct Definition {
-    std::function<float(float)> f;                          // function to evaluate
+    std::function<double(double)> f;                          // function to evaluate
     std::unique_ptr<cubic_splines::Axis> f_trafo = nullptr; // trafo of function values
     std::unique_ptr<cubic_splines::Axis> axis;              // trafo of axis
 
@@ -45,10 +45,10 @@ public:
    * @brief Calculate the function value to the given axis. The interpolated
    * value with no knowledge about the transformation which might has choosen.
    */
-  float evaluate(float x) const;
+  double evaluate(double x) const;
 
-  float prime(float x) const;
+  double prime(double x) const;
 
-  float double_prime(float x) const;
+  double double_prime(double x) const;
 };
 } // namespace cubic_splines
