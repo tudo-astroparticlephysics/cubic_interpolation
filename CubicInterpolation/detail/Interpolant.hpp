@@ -4,6 +4,9 @@
 
 namespace cubic_splines {
 namespace detail {
+
+typedef Axis<double> Axis;
+
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
 auto transform(Axis const &axis, T x) {
   return axis.transform(x);
@@ -36,7 +39,8 @@ auto back_transform_prime(T1 trafo, T2 const &axis, double f, T3 df, T3 x) {
 }
 
 double _find_parameter(std::function<double(double)> const &f,
-                      std::function<double(double)> const &df, double x, Axis const &axis);
+                       std::function<double(double)> const &df, double x,
+                       Axis const &axis);
 
 template <typename T1> auto find_parameter(T1 const &inter, double val, double x) {
   auto f = [&inter, val](double xi) { return inter.evaluate(xi) - val; };

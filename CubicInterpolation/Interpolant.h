@@ -7,6 +7,7 @@
 #include <utility>
 
 namespace cubic_splines {
+
 /**
  * @brief Utility class for a better handling of interpolants. Take care about
  * transformation of axis building, loading and storage of intepolation tables.

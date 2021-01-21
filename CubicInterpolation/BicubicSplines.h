@@ -13,8 +13,9 @@ namespace cubic_splines {
  * definition area it will be  transformed with the Axis transformations
  * specified in the BicubicSplines::Definition.
  */
-class BicubicSplines {
+template <typename T> class BicubicSplines {
 public:
+  using type = T;
   /**
    * @brief Storage class to write and load the interpolation tables from  disk.
    * After reading and writing the object will be destructed.
@@ -29,11 +30,11 @@ public:
    * @brief Properties of an *2-dim* interpolation object.
    */
   struct Definition {
-    std::function<double(double, double)> f;      // function to evaluate
-    std::unique_ptr<Axis> f_trafo = nullptr;   // trafo of function values
-    std::array<std::unique_ptr<Axis>, N> axis; // trafo of axis
+    std::function<T(T, T)> f;                     // function to evaluate
+    std::unique_ptr<Axis<T>> f_trafo = nullptr;   // trafo of function values
+    std::array<std::unique_ptr<Axis<T>>, N> axis; // trafo of axis
 
-    const std::array<std::unique_ptr<Axis>, N> &GetAxis() const { return axis; };
+    const std::array<std::unique_ptr<Axis<T>>, N> &GetAxis() const { return axis; };
   };
 
   BicubicSplines(Definition const &);
@@ -50,22 +51,25 @@ public:
    * value with no knowledge about the transformation which might has choosen.
    * Requires an iterable container with the *x_i* values stored.
    */
-  double evaluate(double x0, double x1) const;
+  T evaluate(T x0, T x1) const;
 
-  template <typename T> auto evaluate(T iterable) const {
+  template <typename T1> auto evaluate(T1 iterable) const {
     return evaluate(iterable[0], iterable[1]);
   }
 
-  std::array<double, 2> prime(double x0, double x1) const;
+  std::array<T, 2> prime(T x0, T x1) const;
 
-  template <typename T> auto prime(T iterable) const {
+  template <typename T1> auto prime(T1 iterable) const {
     return prime(iterable[0], iterable[1]);
   }
 
-  double double_prime(double x0, double x1) const;
+  T double_prime(T x0, T x1) const;
 
-  template <typename T> auto double_prime(T iterable) const {
+  template <typename T1> auto double_prime(T1 iterable) const {
     return double_prime(iterable[0], iterable[1]);
   }
 };
+
+/* template class BicubicSplines<float>; */
+template class BicubicSplines<double>;
 } // namespace cubic_splines

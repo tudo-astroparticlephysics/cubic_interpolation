@@ -12,9 +12,10 @@ namespace cubic_splines {
  * definition area it will be  transformed with the Axis transformations
  * specified in the CubicSplines::Definition.
  */
-class CubicSplines {
-
+template <typename T> class CubicSplines {
 public:
+  using type = T;
+
   struct StorageData;
 
   struct RuntimeData;
@@ -25,11 +26,11 @@ public:
    * @brief Properties of an *1-dim* interpolation object.
    */
   struct Definition {
-    std::function<double(double)> f;                          // function to evaluate
-    std::unique_ptr<cubic_splines::Axis> f_trafo = nullptr; // trafo of function values
-    std::unique_ptr<cubic_splines::Axis> axis;              // trafo of axis
+    std::function<T(T)> f;                                     // function to evaluate
+    std::unique_ptr<cubic_splines::Axis<T>> f_trafo = nullptr; // trafo of function values
+    std::unique_ptr<cubic_splines::Axis<T>> axis;              // trafo of axis
 
-    const Axis &GetAxis() const { return *axis; };
+    const Axis<T> &GetAxis() const { return *axis; };
   };
 
   CubicSplines(Definition const &);
@@ -45,10 +46,14 @@ public:
    * @brief Calculate the function value to the given axis. The interpolated
    * value with no knowledge about the transformation which might has choosen.
    */
-  double evaluate(double x) const;
+  T evaluate(T x) const;
 
-  double prime(double x) const;
+  T prime(T x) const;
 
-  double double_prime(double x) const;
+  T double_prime(T x) const;
 };
+
+template class CubicSplines<float>;
+template class CubicSplines<double>;
+
 } // namespace cubic_splines

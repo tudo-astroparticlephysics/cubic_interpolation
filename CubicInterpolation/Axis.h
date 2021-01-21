@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <ostream>
 
 namespace cubic_splines {
@@ -9,13 +10,15 @@ namespace cubic_splines {
  * keep the number of support points and the approximation error low. Evaluate
  * points out of range will cause undefined behavour.
  */
-class Axis {
+template <typename T> class Axis {
 protected:
-  double low, high, stepsize;
+  T low, high, stepsize;
 
-  virtual void print(std::ostream &os) const;
+  virtual void print(std::ostream &os) const {
+    os << "low: " << low << ", high: " << high << ", stepsize: " << stepsize;
+  };
 
-  friend std::ostream &operator<<(std::ostream &out, const Axis &);
+  /* friend std::ostream &operator<<(std::ostream &out, const Axis<T> &); */
 
 public:
   /**
@@ -26,14 +29,14 @@ public:
    * @param _high upper limit of the axis
    * @param _stepsize stepsize in values of the transformation
    */
-  Axis(double _low, double _high, double _stepsize);
+  Axis(T _low, T _high, T _stepsize) : low(_low), high(_high), stepsize(_stepsize) {}
 
   /**
    * @brief Return the corresponding lower node which is nearest to the
    * point and manipulate the *x*-value to the relative distance from the
    * node to the next one.
    */
-  virtual double transform(double x) const noexcept = 0;
+  virtual T transform(T x) const = 0;
 
   /**
    * @brief Calculate the corresponding point to the *n*-th node. The *0*-th
@@ -41,81 +44,102 @@ public:
    * of the axis. The decimal digits specify the relative distance to the next
    * node.
    */
-  virtual double back_transform(double x) const noexcept = 0;
+  virtual T back_transform(T x) const = 0;
 
   /**
    * @brief Calculates the required number of nodes.
    */
-  virtual size_t required_nodes() const;
+  auto required_nodes() const {
+    auto nodes = transform(high);
+    if (std::floor(nodes) == nodes)
+      return nodes + 1;
+    return nodes + 2;
+  }
 
   /**
    * @brief Lower axis limit.
    */
-  double GetLow() const noexcept { return low; }
+  auto GetLow() const noexcept { return low; }
 
   /**
    * @brief Upper axis limit.
    */
-  double GetHigh() const noexcept { return high; }
+  auto GetHigh() const noexcept { return high; }
 
   /**
    * @brief Derivate of the Axis forward transformation.
    */
-  virtual double derive(double x) const = 0;
+  virtual T derive(T x) const = 0;
+  virtual T back_derive(T x) const = 0;
 };
 
-std::ostream &operator<<(std::ostream &out, const Axis &axis);
-} // namespace cubic_splines
+template <typename T> std::ostream &operator<<(std::ostream &out, const Axis<T> &axis) {
+  axis.print(out);
+  return out;
+}
 
-namespace cubic_splines {
 /**
  * @brief Exponential axis to interpolate over many different scales. As basis
  * the euler number choosen by default if no further specified. Nodes will
  * distributed in form of \f$ \exp(n \cdot \text{stepsize}) \f$
  */
-class ExpAxis : public Axis {
+template <typename T> class ExpAxis : public Axis<T> {
 
-  void print(std::ostream &os) const;
+  void print(std::ostream &os) const {
+    os << "ExpAxis(";
+    Axis<T>::print(os);
+    os << ")";
+  }
 
 public:
   /**
    * @brief Exponential Axis initialized with stepsize.
    */
-  ExpAxis(double _low, double _high, double _stepsize = 1);
+  ExpAxis(T _low, T _high, T _stepsize = 1) : Axis<T>(_low, _high, _stepsize) {}
 
   /**
    * @brief Exponential Axis initialized with number of nodes.
    */
-  ExpAxis(double _low, double _high, size_t _nodes);
+  ExpAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
+    this->stepsize = std::log(_high / _low) / (_nodes - 1);
+  }
 
-  double transform(double x) const noexcept final;
-  double back_transform(double x) const noexcept final;
-  double derive(double x) const final;
+  T transform(T x) const final { return std::log(x / this->low) / this->stepsize; }
+  T back_transform(T t) const final { return this->low * std::exp(t * this->stepsize); }
+
+  T derive(T x) const final { return 1. / (x * this->stepsize); }
+  T back_derive(T t) const final {
+    return this->low * this->stepsize * std::exp(t * this->stepsize);
+  }
 };
-} // namespace cubic_splines
 
-namespace cubic_splines {
 /**
  * @brief Linear axis to describe data which varify not to much in orders of
  * magnitudes. It's the fastest axis evaluation.
  */
-class LinAxis : public Axis {
-
-  void print(std::ostream &os) const;
+template <typename T> class LinAxis : public Axis<T> {
+  void print(std::ostream &os) const {
+    os << "LinAxis(";
+    Axis<T>::print(os);
+    os << ")";
+  }
 
 public:
   /**
    * @brief Linear Axis initalized with stepsize.
    */
-  LinAxis(double _low, double _high, double _stepsize);
+  LinAxis(T _low, T _high, T _stepsize) : Axis<T>(_low, _high, _stepsize) {}
 
   /**
    * @brief Linear Axis with number of nodes.
    */
-  LinAxis(double _low, double _high, size_t _nodes);
+  LinAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
+    this->stepsize = (_high - _low) / (_nodes - 1);
+  }
 
-  double transform(double x) const noexcept final;
-  double back_transform(double x) const noexcept final;
-  double derive(double) const final;
+  T transform(T x) const final { return (x - this->low) / this->stepsize; }
+  T back_transform(T x) const final { return x * this->stepsize + this->low; }
+  T derive(T) const final { return 1. / this->stepsize; }
+  T back_derive(T x) const final { return this->stepsize; }
 };
 } // namespace cubic_splines

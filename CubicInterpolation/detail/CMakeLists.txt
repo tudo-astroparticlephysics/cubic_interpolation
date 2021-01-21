@@ -1,5 +1,4 @@
 set(CUBIC_INTERPOLATION_SRC
-    Axis.cxx
     BicubicSplines.cxx
     CubicSplines.cxx
     InterpolantBuilder.cxx
