@@ -11,21 +11,21 @@ double func1dim(double x) { return x * x + x; }
 double func2dim(double x, double y) { return x * x + y * y; }
 
 int main() {
-  auto def1d = cubic_splines::CubicSplines::Definition();
+  auto def1d = cubic_splines::CubicSplines<double>::Definition();
   def1d.f = func1dim;
-  def1d.axis = std::make_unique<cubic_splines::LinAxis>(-2.f, 2.f, (size_t)10);
-  auto inter1d = cubic_splines::Interpolant<cubic_splines::CubicSplines>(std::move(def1d), "", "");
+  def1d.axis = std::make_unique<cubic_splines::LinAxis<double>>(-2.f, 2.f, (size_t)10);
+  auto inter1d = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>(std::move(def1d), "", "");
   auto function_value = 1.f;
   auto guess = 0.5f;
 
   auto x = find_parameter(inter1d, function_value, guess);
   std::cout << "f(x) = " << function_value << " -> x = " << x << std::endl;
 
-  auto def2d = cubic_splines::BicubicSplines::Definition();
+  auto def2d = cubic_splines::BicubicSplines<double>::Definition();
   def2d.f = func2dim;
-  def2d.axis[0] = std::make_unique<cubic_splines::LinAxis>(1.e-5f, 1.e1f, (size_t)10);
-  def2d.axis[1] = std::make_unique<cubic_splines::LinAxis>(1.e-5f, 1.e1f, (size_t)10);
-  auto inter2d = cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def2d), "", "");
+  def2d.axis[0] = std::make_unique<cubic_splines::LinAxis<double>>(1.e-5f, 1.e1f, (size_t)10);
+  def2d.axis[1] = std::make_unique<cubic_splines::LinAxis<double>>(1.e-5f, 1.e1f, (size_t)10);
+  auto inter2d = cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>(std::move(def2d), "", "");
 
   function_value = 42.f;
   auto x_val = 0.5f;

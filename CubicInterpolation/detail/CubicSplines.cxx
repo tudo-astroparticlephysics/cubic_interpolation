@@ -18,7 +18,11 @@ template <typename T> struct CubicSplines<T>::StorageData {
   T upper_lim_derivate;
 
   friend class boost::serialization::access;
-  template <class Archive> void serialize(Archive &ar, const unsigned int) { ar &y; };
+  template <class Archive> void serialize(Archive &ar, const unsigned int) {
+    ar &y;
+    ar &lower_lim_derivate;
+    ar &upper_lim_derivate;
+  };
 
 public:
   StorageData() = default;
@@ -71,36 +75,21 @@ template <typename T>
 CubicSplines<T>::CubicSplines(Definition const &def)
     : data(::std::make_unique<CubicSplines::RuntimeData>()) {
   using boost::math::differentiation::finite_difference_derivative;
-  auto y = std::vector<T>(def.axis->required_nodes());
   auto func = [&def](T x) {
     auto fx = def.f(x);
     if (def.f_trafo)
       fx = def.f_trafo->transform(fx);
     return fx;
   };
+  auto y = std::vector<T>(def.axis->required_nodes());
   for (size_t n = 0; n < y.size(); ++n)
     y[n] = func(def.axis->back_transform(n));
-  auto n_max = y.size() - 1;
-
-  auto low = def.axis->back_transform(0);
-  auto up = def.axis->back_transform(n_max);
-
-  /* std::cout << "low: " << low << std::endl; */
-  /* std::cout << "up: " << up << std::endl; */
-
-  /* std::cout << "diff f: " << finite_difference_derivative(func, low) << std::endl; */
-  /* std::cout << "diff f: " << finite_difference_derivative(func, up) << std::endl; */
-
-  /* std::cout << "diff trafo: " << def.axis->back_derive(0) << std::endl; */
-  /* std::cout << "diff trafo: " << def.axis->back_derive(n_max) << std::endl; */
-
-  auto lower_lim_derivate =
-      finite_difference_derivative(func, low) * def.axis->back_derive(0);
-  auto upper_lim_derivate =
-      finite_difference_derivative(func, up) * def.axis->back_derive(n_max);
-
-  data = ::std::make_unique<CubicSplines::RuntimeData>(y, lower_lim_derivate,
-                                                       upper_lim_derivate);
+  auto f_derivate = [func, axis = def.axis.get()](T t) {
+    return func(axis->back_transform(t));
+  };
+  auto diff_low = finite_difference_derivative(f_derivate, static_cast<T>(0));
+  auto diff_up = finite_difference_derivative(f_derivate, static_cast<T>(y.size() - 1));
+  data = ::std::make_unique<CubicSplines::RuntimeData>(y, diff_low, diff_up);
 }
 
 template <typename T> T CubicSplines<T>::evaluate(T x) const { return data->spline(x); };

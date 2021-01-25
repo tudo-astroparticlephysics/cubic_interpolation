@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
 namespace cubic_splines {
 
@@ -31,8 +32,9 @@ public:
    */
   struct Definition {
     std::function<T(T, T)> f;                     // function to evaluate
-    std::unique_ptr<Axis<T>> f_trafo = nullptr;   // trafo of function values
+    std::unique_ptr<Axis<T>> f_trafo;             // trafo of function values
     std::array<std::unique_ptr<Axis<T>>, N> axis; // trafo of axis
+    bool approx_derivates;
 
     const std::array<std::unique_ptr<Axis<T>>, N> &GetAxis() const { return axis; };
   };
@@ -44,6 +46,21 @@ private:
   BicubicSplines(RuntimeData);
 
   std::shared_ptr<RuntimeData> data;
+
+  std::tuple<T, T> back_transform(Definition const &, long unsigned int,
+                                  long unsigned int) const;
+  std::tuple<T, T> derive_axis(Definition const &, T, T) const;
+
+  template <typename T1>
+  std::tuple<T, T> _prime(Definition const &def, T1 func, unsigned int n1,
+                          unsigned int n2);
+
+  template <typename T1>
+  std::vector<std::tuple<unsigned int, T>> _prime(std::vector<T> const &yi, T1 func,
+                                                  unsigned int n_max);
+
+  template <typename T1>
+  T _double_prime(Definition const &def, T1 func, unsigned int n1, unsigned int n2);
 
 public:
   /**

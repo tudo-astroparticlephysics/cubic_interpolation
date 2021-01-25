@@ -122,7 +122,7 @@ TEST(CubicSplines, prime) {
   std::uniform_real_distribution<double> dis(low, high);
   for (int i = 0; i < 10'000; ++i) {
     auto x = dis(gen);
-    EXPECT_NEAR(df_dx(x), spline.prime(x), std::abs(func(x)) * 1e-2);
+    EXPECT_NEAR(df_dx(x), spline.prime(x), std::abs(func(x)) * 2e-2);
   }
 }
 

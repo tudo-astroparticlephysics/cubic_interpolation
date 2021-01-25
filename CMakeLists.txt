@@ -5,7 +5,7 @@ project(CubicInterpolation LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CTest)
 
-set(project_BUILD_TESTING BUILD_TESTING)
+# set(project_BUILD_TESTING BUILD_TESTING)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
@@ -68,9 +68,9 @@ export(EXPORT CubicInterpolationTargets
 add_subdirectory(example)
 add_subdirectory(docs)
 
-if(project_BUILD_TESTING)
-    include(googletest)
+# if(project_BUILD_TESTING)
+#     include(googletest)
 
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+#     enable_testing()
+#     add_subdirectory(tests)
+# endif()

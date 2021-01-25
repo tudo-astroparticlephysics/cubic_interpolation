@@ -15,11 +15,11 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  auto def = cubic_splines::CubicSplines::Definition();
+  auto def = cubic_splines::CubicSplines<double>::Definition();
   def.f = func;
-  def.axis = std::make_unique<cubic_splines::LinAxis>(-2.f, 2.f, (size_t)10);
+  def.axis = std::make_unique<cubic_splines::LinAxis<double>>(-2.f, 2.f, (size_t)10);
 
-  auto inter = cubic_splines::Interpolant<cubic_splines::CubicSplines>(
+  auto inter = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>(
       std::move(def), "", "");
 
   auto point = std::atof(argv[1]);

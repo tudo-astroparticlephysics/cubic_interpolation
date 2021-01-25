@@ -18,13 +18,13 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  auto def = cubic_splines::BicubicSplines::Definition();
+  auto def = cubic_splines::BicubicSplines<double>::Definition();
   def.f = func;
-  def.axis[0] = std::make_unique<cubic_splines::LinAxis>(-1, 1, (size_t)11);
-  def.axis[1] = std::make_unique<cubic_splines::LinAxis>(-1, 1, (size_t)11);
+  def.axis[0] = std::make_unique<cubic_splines::LinAxis<double>>(-1., 1., (size_t)11);
+  def.axis[1] = std::make_unique<cubic_splines::LinAxis<double>>(-1., 1., (size_t)11);
 
   auto inter =
-      cubic_splines::Interpolant<cubic_splines::BicubicSplines>(std::move(def), "/tmp", "interpolant.txt");
+      cubic_splines::Interpolant<cubic_splines::BicubicSplines<double>>(std::move(def), "/tmp", "interpolant.txt");
 
   auto point = std::array<double, 2>{std::stof(argv[1]), std::stof(argv[2])};
   auto res = inter.evaluate(point);
