@@ -53,7 +53,5 @@ public:
   T double_prime(T x) const;
 };
 
-template class CubicSplines<float>;
-template class CubicSplines<double>;
 
 } // namespace cubic_splines

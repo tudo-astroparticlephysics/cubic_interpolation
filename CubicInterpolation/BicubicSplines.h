@@ -86,7 +86,4 @@ public:
     return double_prime(iterable[0], iterable[1]);
   }
 };
-
-/* template class BicubicSplines<float>; */
-template class BicubicSplines<double>;
 } // namespace cubic_splines

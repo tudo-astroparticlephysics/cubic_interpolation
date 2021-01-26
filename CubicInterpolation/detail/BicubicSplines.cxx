@@ -192,24 +192,16 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
     return def.f(x1, x2);
   };
 
-  auto begin = std::chrono::steady_clock::now();
   for (auto n1 = 0u; n1 < data->y.rows(); ++n1) {
     for (auto n2 = 0u; n2 < data->y.cols(); ++n2) {
       auto x = back_transform(def, n1, n2);
       data->y(n1, n2) = func(std::get<0>(x), std::get<1>(x));
     }
   }
-  auto end = std::chrono::steady_clock::now();
-  std::cout << "function evaluation takes "
-            << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
-            << " ms" << std::endl;
 
   auto n_rows = data->y.rows();
   auto n_cols = data->y.cols();
-  std::cout << "approx derivates: " << def.approx_derivates << std::endl;
-  begin = std::chrono::steady_clock::now();
   if (def.approx_derivates) {
-    std::cout << "prime with splines";
     for (auto n1 = 0u; n1 < n_rows; ++n1) {
       auto yi = RuntimeData::to_vector(data->y.row(n1));
       auto diff = [this, &def, &func, n1](unsigned int n) {
@@ -227,7 +219,6 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
         data->dydx2(n1, n2) = dydx2;
     }
   } else {
-    std::cout << "prime with real derivation";
     for (auto n1 = 0u; n1 < n_rows; ++n1) {
       for (auto n2 = 0u; n2 < n_cols; ++n2) {
         auto &dydx1 = data->dydx1(n1, n2);
@@ -236,14 +227,8 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
       }
     }
   }
-  end = std::chrono::steady_clock::now();
-  std::cout << " takes "
-            << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
-            << " ms" << std::endl;
 
-  begin = std::chrono::steady_clock::now();
   if (def.approx_derivates) {
-    std::cout << "double prime with splines." << std::endl;
     for (auto n1 = 0u; n1 < n_rows; ++n1) {
       auto yi = RuntimeData::to_vector(data->dydx2.row(n1));
       auto diff = [this, &def, &func, n1](unsigned int n) {
@@ -253,16 +238,11 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
         data->d2ydx1dx2(n1, n2) = d2ydx1dx2;
     }
   } else {
-    std::cout << "double prime with real derivation" << std::endl;
     for (auto n1 = 0u; n1 < n_rows; ++n1) {
       for (auto n2 = 0u; n2 < n_cols; ++n2)
         data->d2ydx1dx2(n1, n2) = _double_prime(def, func, n1, n2);
     }
   }
-  end = std::chrono::steady_clock::now();
-  std::cout << " takes "
-            << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
-            << " ms" << std::endl;
 }
 
 template <typename T> T BicubicSplines<T>::evaluate(T x0, T x1) const {
