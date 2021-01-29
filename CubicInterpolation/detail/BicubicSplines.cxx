@@ -63,7 +63,7 @@ template <typename T> struct BicubicSplines<T>::RuntimeData {
   StorageData to_storage_data() const;
 };
 
-template <typename T> class BicubicSplines<T>::StorageData {
+template <typename T> struct BicubicSplines<T>::StorageData {
   using MatrixX = ::Eigen::Matrix<T, ::Eigen::Dynamic, ::Eigen::Dynamic>;
 
   ::std::array<long int, 2> size;
