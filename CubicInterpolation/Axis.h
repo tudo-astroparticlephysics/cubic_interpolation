@@ -31,6 +31,8 @@ public:
    */
   Axis(T _low, T _high, T _stepsize) : low(_low), high(_high), stepsize(_stepsize) {}
 
+  virtual ~Axis() = default;
+
   /**
    * @brief Return the corresponding lower node which is nearest to the
    * point and manipulate the *x*-value to the relative distance from the

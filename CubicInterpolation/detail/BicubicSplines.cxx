@@ -271,9 +271,9 @@ template <typename T> std::array<T, 2> BicubicSplines<T>::prime(T x0, T x1) cons
 template <typename T> T BicubicSplines<T>::double_prime(T x0, T x1) const {
   using boost::math::differentiation::finite_difference_derivative;
   return finite_difference_derivative(
-      [this, x0, x1](T x_1) {
+      [this, x1](T x_1) {
         return finite_difference_derivative(
-            [this, x1, x_1](T x_2) { return evaluate(x_1, x_2); }, x1);
+            [this, x_1](T x_2) { return evaluate(x_1, x_2); }, x1);
       },
       x0);
 }
