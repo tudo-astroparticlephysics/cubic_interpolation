@@ -31,12 +31,14 @@ public:
    */
   Axis(T _low, T _high, T _stepsize) : low(_low), high(_high), stepsize(_stepsize) {}
 
+  virtual ~Axis() = default;
+
   /**
    * @brief Return the corresponding lower node which is nearest to the
    * point and manipulate the *x*-value to the relative distance from the
    * node to the next one.
    */
-  virtual T transform(T x) const = 0;
+  virtual T transform(T) const = 0;
 
   /**
    * @brief Calculate the corresponding point to the *n*-th node. The *0*-th
@@ -44,7 +46,7 @@ public:
    * of the axis. The decimal digits specify the relative distance to the next
    * node.
    */
-  virtual T back_transform(T x) const = 0;
+  virtual T back_transform(T) const = 0;
 
   /**
    * @brief Calculates the required number of nodes.
@@ -140,6 +142,6 @@ public:
   T transform(T x) const final { return (x - this->low) / this->stepsize; }
   T back_transform(T x) const final { return x * this->stepsize + this->low; }
   T derive(T) const final { return 1. / this->stepsize; }
-  T back_derive(T x) const final { return this->stepsize; }
+  T back_derive(T) const final { return this->stepsize; }
 };
 } // namespace cubic_splines
