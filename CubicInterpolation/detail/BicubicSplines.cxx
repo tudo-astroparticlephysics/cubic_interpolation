@@ -131,18 +131,15 @@ std::tuple<T, T> BicubicSplines<T>::back_transform(Definition const &def,
   return std::make_tuple(x1, x2);
 }
 
-
 template <typename T>
 template <typename T1>
 std::tuple<T, T> BicubicSplines<T>::_prime(Definition const &def, T1 func,
                                            unsigned int n1, unsigned int n2) {
   using boost::math::differentiation::finite_difference_derivative;
-  auto f_x1 = [&func, &ax = *(def.axis[0]), n2](T t1) {
-    return func(ax.back_transform(t1), ax.back_transform(n2));
-  };
-  auto f_x2 = [&func, &ax = *(def.axis[1]), n1](T t2) {
-    return func(ax.back_transform(n1), ax.back_transform(t2));
-  };
+  auto f_x1 = [&func, ax = def.axis[0].get(), x2 = def.axis[1]->back_transform(n2)](
+                  T t1) { return func(ax->back_transform(t1), x2); };
+  auto f_x2 = [&func, ax = def.axis[1].get(), x1 = def.axis[0]->back_transform(n1)](
+                  T t2) { return func(x1, ax->back_transform(t2)); };
   auto dydx1 = finite_difference_derivative(f_x1, static_cast<T>(n1));
   auto dydx2 = finite_difference_derivative(f_x2, static_cast<T>(n2));
   return std::make_tuple(dydx1, dydx2);
@@ -165,14 +162,17 @@ template <typename T1>
 T BicubicSplines<T>::_double_prime(Definition const &def, T1 func, unsigned int n1,
                                    unsigned int n2) {
   using boost::math::differentiation::finite_difference_derivative;
-  auto dydx2 = [&func, &ax = def.axis, n1](T t1) {
-    return finite_difference_derivative(
-        [&func, &ax, n1](T t2) {
-          return func(ax[0]->back_transform(n1), ax[1]->back_transform(t2));
-        },
-        t1);
+  auto f_x1 = [&func, ax = def.axis[0].get()](T t1, T t2) {
+    return func(ax->back_transform(t1), t2);
   };
-  return finite_difference_derivative(dydx2, static_cast<T>(n2));
+  auto dydx1 = [&f_x1, n1](T t2) {
+    return finite_difference_derivative([&f_x1, t2](T t1) { return f_x1(t1, t2); },
+                                        static_cast<T>(n1));
+  };
+  auto dydx1_x2 = [&dydx1, n1, ax = def.axis[1].get()](T t2) {
+    return dydx1(ax->back_transform(t2));
+  };
+  return finite_difference_derivative(dydx1_x2, static_cast<T>(n2));
 }
 
 template <typename T>

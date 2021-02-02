@@ -43,7 +43,7 @@ public:
   BicubicSplines(Definition const &);
   BicubicSplines(Definition const &, std::string, std::string);
 
-private:
+protected:
   BicubicSplines(RuntimeData);
 
   std::shared_ptr<RuntimeData> data;
