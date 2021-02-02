@@ -1,6 +1,7 @@
 #include "../Axis.h"
 
 #include <functional>
+#include <iostream>
 
 namespace cubic_splines {
 namespace detail {
@@ -27,8 +28,9 @@ template <typename T> auto back_transform(T trafo, double val) {
 template <typename T>
 auto back_transform_prime(T trafo, Axis const &axis, double f, double df, double x) {
   if (trafo)
-    df *= trafo->derive(f);
-  return df * axis.derive(x);
+    df *= f;
+  df *= axis.derive(x);
+  return df;
 }
 
 template <typename T1, typename T2, typename T3>
@@ -58,9 +60,7 @@ auto find_parameter(T1 const &inter, double val, T2 x, size_t n) {
   auto f = [&inter, val, &x, n](double xi) {
     return inter.evaluate(updated_val(x, n, xi)) - val;
   };
-  auto df = [&inter, &x, n](double xi) {
-    return inter.prime(updated_val(x, n, xi))[n];
-  };
+  auto df = [&inter, &x, n](double xi) { return inter.prime(updated_val(x, n, xi))[n]; };
   return _find_parameter(f, df, x[n], *inter.GetDefinition().axis[n]);
 }
 } // namespace detail
