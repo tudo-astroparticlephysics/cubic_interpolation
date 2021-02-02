@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <ostream>
 
 namespace cubic_splines {
@@ -29,7 +28,7 @@ public:
    * @param _high upper limit of the axis
    * @param _stepsize stepsize in values of the transformation
    */
-  Axis(T _low, T _high, T _stepsize) : low(_low), high(_high), stepsize(_stepsize) {}
+  Axis(T _low, T _high, T _stepsize);
 
   /**
    * @brief Return the corresponding lower node which is nearest to the
@@ -49,12 +48,7 @@ public:
   /**
    * @brief Calculates the required number of nodes.
    */
-  auto required_nodes() const {
-    auto nodes = transform(high);
-    if (std::floor(nodes) == nodes)
-      return nodes + 1;
-    return nodes + 2;
-  }
+  unsigned int required_nodes() const;
 
   /**
    * @brief Lower axis limit.
@@ -95,22 +89,18 @@ public:
   /**
    * @brief Exponential Axis initialized with stepsize.
    */
-  ExpAxis(T _low, T _high, T _stepsize = 1) : Axis<T>(_low, _high, _stepsize) {}
+  ExpAxis(T _low, T _high, T _stepsize = 1);
 
   /**
    * @brief Exponential Axis initialized with number of nodes.
    */
-  ExpAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
-    this->stepsize = std::log(_high / _low) / (_nodes - 1);
-  }
+  ExpAxis(T _low, T _high, size_t _nodes);
 
-  T transform(T x) const final { return std::log(x / this->low) / this->stepsize; }
-  T back_transform(T t) const final { return this->low * std::exp(t * this->stepsize); }
+  T transform(T x) const final;
+  T back_transform(T t) const final;
 
-  T derive(T x) const final { return 1. / (x * this->stepsize); }
-  T back_derive(T t) const final {
-    return this->low * this->stepsize * std::exp(t * this->stepsize);
-  }
+  T derive(T x) const final;
+  T back_derive(T t) const final;
 };
 
 /**
@@ -128,18 +118,16 @@ public:
   /**
    * @brief Linear Axis initalized with stepsize.
    */
-  LinAxis(T _low, T _high, T _stepsize) : Axis<T>(_low, _high, _stepsize) {}
+  LinAxis(T _low, T _high, T _stepsize);
 
   /**
    * @brief Linear Axis with number of nodes.
    */
-  LinAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
-    this->stepsize = (_high - _low) / (_nodes - 1);
-  }
+  LinAxis(T _low, T _high, size_t _nodes);
 
-  T transform(T x) const final { return (x - this->low) / this->stepsize; }
-  T back_transform(T x) const final { return x * this->stepsize + this->low; }
-  T derive(T) const final { return 1. / this->stepsize; }
-  T back_derive(T x) const final { return this->stepsize; }
+  T transform(T x) const final;
+  T back_transform(T x) const final;
+  T derive(T) const final;
+  T back_derive(T x) const final;
 };
 } // namespace cubic_splines

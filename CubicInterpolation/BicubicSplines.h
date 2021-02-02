@@ -49,7 +49,6 @@ private:
 
   std::tuple<T, T> back_transform(Definition const &, long unsigned int,
                                   long unsigned int) const;
-  std::tuple<T, T> derive_axis(Definition const &, T, T) const;
 
   template <typename T1>
   std::tuple<T, T> _prime(Definition const &def, T1 func, unsigned int n1,

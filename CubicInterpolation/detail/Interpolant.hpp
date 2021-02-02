@@ -28,7 +28,7 @@ template <typename T>
 auto back_transform_prime(T trafo, Axis const &axis, double f, double df, double x) {
   if (trafo)
     df *= trafo->derive(f);
-  return df / axis.derive(x);
+  return df * axis.derive(x);
 }
 
 template <typename T1, typename T2, typename T3>

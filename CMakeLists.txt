@@ -5,8 +5,6 @@ project(CubicInterpolation LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CTest)
 
-# set(project_BUILD_TESTING BUILD_TESTING)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -37,7 +35,7 @@ target_include_directories(CubicInterpolation INTERFACE
 
 set_target_properties(CubicInterpolation PROPERTIES
     POSITION_INDEPENDENT_CODE ON
-)
+    )
 
 install(TARGETS CubicInterpolation EXPORT CubicInterpolationTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -62,15 +60,15 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
     )
 
 export(EXPORT CubicInterpolationTargets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationTargets.cmake"
-)
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationTargets.cmake"
+    )
 
 add_subdirectory(example)
 add_subdirectory(docs)
 
-# if(project_BUILD_TESTING)
-#     include(googletest)
+if(BUILD_TESTING)
+    include(googletest)
 
-#     enable_testing()
-#     add_subdirectory(tests)
-# endif()
+    enable_testing()
+    add_subdirectory(tests)
+endif()

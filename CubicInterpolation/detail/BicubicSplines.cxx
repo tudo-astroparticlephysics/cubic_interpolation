@@ -131,12 +131,6 @@ std::tuple<T, T> BicubicSplines<T>::back_transform(Definition const &def,
   return std::make_tuple(x1, x2);
 }
 
-template <typename T>
-std::tuple<T, T> BicubicSplines<T>::derive_axis(Definition const &def, T x1, T x2) const {
-  auto dfdx1 = def.axis[0]->derive(x1);
-  auto dfdx2 = def.axis[1]->derive(x2);
-  return std::make_tuple(dfdx1, dfdx2);
-}
 
 template <typename T>
 template <typename T1>
