@@ -58,7 +58,7 @@ auto find_parameter(T1 const &inter, double val, T2 x, size_t n) {
   auto f = [&inter, val, &x, n](double xi) {
     return inter.evaluate(updated_val(x, n, xi)) - val;
   };
-  auto df = [&inter, val, &x, n](double xi) {
+  auto df = [&inter, &x, n](double xi) {
     return inter.prime(updated_val(x, n, xi))[n];
   };
   return _find_parameter(f, df, x[n], *inter.GetDefinition().axis[n]);
