@@ -30,7 +30,7 @@ TEST(BicubicSplines, evaluate_cubic_polynom) {
   auto low = 1.f;
   auto high = 10.f;
   auto def = spline_def_t();
-  auto func = [](double x1, double x2) { return x1 * x1 * x1 + x2 * x2; };
+  auto func = [](double x1, double x2) { return x1 * x1 * x2 + x2 * x2; };
   def.f = func;
   def.approx_derivates = true;
   def.axis[0] = std::make_unique<cubic_splines::LinAxis<double>>(low, high, N);
