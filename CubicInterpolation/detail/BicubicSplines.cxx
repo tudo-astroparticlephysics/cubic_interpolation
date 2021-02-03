@@ -133,29 +133,33 @@ std::tuple<T, T> BicubicSplines<T>::back_transform(Definition const &def,
 
 template <typename T>
 template <typename T1>
-std::tuple<T, T> BicubicSplines<T>::_prime(Definition const &def, T1 func,
-                                           unsigned int n1, unsigned int n2) {
+std::array<T, 2>
+BicubicSplines<T>::_prime(T1 func, std::array<std::unique_ptr<Axis<T>>, 2> const &axis,
+                          unsigned int n1, unsigned int n2) {
   using boost::math::differentiation::finite_difference_derivative;
-  auto f_x1 = [&func, ax = def.axis[0].get(), x2 = def.axis[1]->back_transform(n2)](
-                  T t1) { return func(ax->back_transform(t1), x2); };
-  auto f_x2 = [&func, ax = def.axis[1].get(), x1 = def.axis[0]->back_transform(n1)](
-                  T t2) { return func(x1, ax->back_transform(t2)); };
-  auto dydx1 = finite_difference_derivative(f_x1, static_cast<T>(n1));
-  auto dydx2 = finite_difference_derivative(f_x2, static_cast<T>(n2));
-  return std::make_tuple(dydx1, dydx2);
+  auto f_x1 = [&func, ax = axis[0].get(), x2 = axis[1]->back_transform(n2)](T t1) {
+    return func(ax->back_transform(t1), x2);
+  };
+  auto f_x2 = [&func, ax = axis[1].get(), x1 = axis[0]->back_transform(n1)](T t2) {
+    return func(x1, ax->back_transform(t2));
+  };
+  auto dydx = std::array<T, 2>();
+  dydx[0] = finite_difference_derivative(f_x1, static_cast<T>(n1));
+  dydx[1] = finite_difference_derivative(f_x2, static_cast<T>(n2));
+  return dydx;
 }
 
-template <typename T>
-template <typename T1>
-std::vector<std::tuple<unsigned int, T>>
-BicubicSplines<T>::_prime(std::vector<T> const &yi, T1 func, unsigned int n_max) {
-  auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>(
-      yi.data(), yi.size(), 0, 1, func(0u), func(n_max));
-  auto diff = std::vector<std::tuple<unsigned int, T>>();
-  for (auto i = 0u; i < n_max; ++i)
-    diff.emplace_back(i, spline.prime(i));
-  return diff;
-}
+/* template <typename T> */
+/* template <typename T1> */
+/* std::vector<std::tuple<unsigned int, T>> */
+/* BicubicSplines<T>::_prime(std::vector<T> const &yi, T1 func, unsigned int n_max) { */
+/*   auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>( */
+/*       yi.data(), yi.size(), 0, 1, func(0u), func(n_max)); */
+/*   auto diff = std::vector<std::tuple<unsigned int, T>>(); */
+/*   for (auto i = 0u; i < n_max; ++i) */
+/*     diff.emplace_back(i, spline.prime(i)); */
+/*   return diff; */
+/* } */
 
 template <typename T>
 template <typename T1>
@@ -196,47 +200,85 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
   auto n_rows = data->y.rows();
   auto n_cols = data->y.cols();
   if (def.approx_derivates) {
-    for (auto n1 = 0u; n1 < n_rows; ++n1) {
-      auto yi = RuntimeData::to_vector(data->y.row(n1));
+
+    /* for (auto n1 = 0u; n1 < n_cols; ++n1) { */
+    /*   auto yi = RuntimeData::to_vector(data->y.col(n1)); */
+    /*   auto diff = [this, &def, &func, n1](unsigned int n) { */
+    /*     return _prime(func, def.axis, n, n1)[0]; */
+    /*   }; */
+    /*   auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>( */
+    /*       yi.data(), yi.size(), 0, 1, diff(0u), diff(n_rows - 1)); */
+    /*   for (auto row = 0; row < n_rows; ++row) */
+    /*     data->dydx1(n1, row) = spline.prime(row); */
+    /* } */
+
+    for (auto n1 = 0u; n1 < n_cols; ++n1) {
+      auto yi = RuntimeData::to_vector(data->y.col(n1));
       auto diff = [this, &def, &func, n1](unsigned int n) {
-        return std::get<0>(_prime(def, func, n1, n));
+        return _prime(func, def.axis, n, n1)[0];
       };
-      for (auto [n2, dydx1] : _prime(yi, diff, n_cols))
-        data->dydx1(n1, n2) = dydx1;
+      auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>(
+          yi.data(), yi.size(), 0, 1, diff(0u), diff(n_rows - 1));
+      for (auto row = 0; row < n_rows; ++row)
+        data->dydx1(n1, row) = spline.prime(row);
     }
-    for (auto n2 = 0u; n2 < n_cols; ++n2) {
-      auto yi = RuntimeData::to_vector(data->y.col(n2));
+    data->dydx1.transposeInPlace();
+
+    ::Eigen::Matrix<T, ::Eigen::Dynamic, ::Eigen::Dynamic> y_rowise = data->y;
+    y_rowise.transposeInPlace();
+    for (auto n2 = 0u; n2 < n_rows; ++n2) {
+      auto yi = RuntimeData::to_vector(y_rowise.col(n2));
       auto diff = [this, &def, &func, n2](unsigned int n) {
-        return std::get<1>(_prime(def, func, n, n2));
+        return _prime(func, def.axis, n2, n)[1];
       };
-      for (auto [n1, dydx2] : _prime(yi, diff, n_rows))
-        data->dydx2(n1, n2) = dydx2;
+      auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>(
+          yi.data(), yi.size(), 0, 1, diff(0u), diff(n_cols - 1));
+      for (auto col = 0; col < n_cols; ++col)
+        data->dydx2(col, n2) = spline.prime(col);
     }
+    data->dydx2.transposeInPlace();
+
+    /* for (auto n2 = 0u; n2 < n_rows; ++n2) { */
+    /*   auto yi = RuntimeData::to_vector(data->y.row(n2)); */
+    /*   auto diff = [this, &def, &func, n2](unsigned int n) { */
+    /*     return _prime(func, def.axis, n, n2)[1]; */
+    /*   }; */
+    /*   for (auto [n1, dydx2] : _prime(yi, diff, n_cols)) */
+    /*     data->dydx2(n1, n2) = dydx2; */
+    /* } */
   } else {
     for (auto n1 = 0u; n1 < n_rows; ++n1) {
       for (auto n2 = 0u; n2 < n_cols; ++n2) {
-        auto &dydx1 = data->dydx1(n1, n2);
-        auto &dydx2 = data->dydx2(n1, n2);
-        std::tie(dydx1, dydx2) = _prime(def, func, n1, n2);
+        auto dydx = _prime(func, def.axis, n1, n2);
+        data->dydx1(n1, n2) = dydx[0];
+        data->dydx2(n1, n2) = dydx[1];
       }
     }
   }
+  std::cout << "dydx1" << std::endl;
+  std::cout << data->dydx1 << std::endl;
+
+  std::cout << "dydx2" << std::endl;
+  std::cout << data->dydx2 << std::endl;
 
   if (def.approx_derivates) {
-    for (auto n1 = 0u; n1 < n_rows; ++n1) {
-      auto yi = RuntimeData::to_vector(data->dydx2.row(n1));
-      auto diff = [this, &def, &func, n1](unsigned int n) {
-        return std::get<0>(_prime(def, func, n1, n));
-      };
-      for (auto [n2, d2ydx1dx2] : _prime(yi, diff, n_cols))
-        data->d2ydx1dx2(n1, n2) = d2ydx1dx2;
-    }
+    /* for (auto n1 = 0u; n1 < n_rows; ++n1) { */
+    /*   auto yi = RuntimeData::to_vector(data->dydx2.row(n1)); */
+    /*   auto diff = [this, &def, &func, n1](unsigned int n) { */
+    /*     return std::get<0>(_prime(func, def.axis, n1, n)); */
+    /*   }; */
+    /*   for (auto [n2, d2ydx1dx2] : _prime(yi, diff, n_cols)) */
+    /*     data->d2ydx1dx2(n1, n2) = d2ydx1dx2; */
+    /* } */
   } else {
     for (auto n1 = 0u; n1 < n_rows; ++n1) {
       for (auto n2 = 0u; n2 < n_cols; ++n2)
         data->d2ydx1dx2(n1, n2) = _double_prime(def, func, n1, n2);
     }
   }
+
+  std::cout << "d2ydx1dx2" << std::endl;
+  std::cout << data->d2ydx1dx2 << std::endl;
 }
 
 template <typename T> T BicubicSplines<T>::evaluate(T x0, T x1) const {

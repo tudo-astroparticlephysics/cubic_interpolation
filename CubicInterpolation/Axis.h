@@ -29,7 +29,6 @@ public:
    * @param _stepsize stepsize in values of the transformation
    */
   Axis(T _low, T _high, T _stepsize);
-
   virtual ~Axis() = default;
 
   /**

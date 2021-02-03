@@ -2,10 +2,10 @@
 
 #include "Axis.h"
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <vector>
-#include <array>
 
 namespace cubic_splines {
 
@@ -52,12 +52,12 @@ protected:
                                   long unsigned int) const;
 
   template <typename T1>
-  std::tuple<T, T> _prime(Definition const &def, T1 func, unsigned int n1,
-                          unsigned int n2);
+  std::array<T, 2> _prime(T1 func, std::array<std::unique_ptr<Axis<T>>, 2> const &axis,
+                          unsigned int n1, unsigned int n2);
 
-  template <typename T1>
-  std::vector<std::tuple<unsigned int, T>> _prime(std::vector<T> const &yi, T1 func,
-                                                  unsigned int n_max);
+  /* template <typename T1> */
+  /* std::vector<std::tuple<unsigned int, T>> _prime(std::vector<T> const &yi, T1 func, */
+  /*                                                 unsigned int n_max); */
 
   template <typename T1>
   T _double_prime(Definition const &def, T1 func, unsigned int n1, unsigned int n2);
