@@ -18,6 +18,7 @@ FetchContent_Declare(
     )
 
 set(BUILD_TESTING OFF)
+set(EIGEN_BUILD_DOC OFF)
 FetchContent_MakeAvailable(eigen3)
 
 set(Eigen3_DIR ${eigen3_BINARY_DIR} CACHE PATH "Preferred Eigen3 installation prefix")
