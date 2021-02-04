@@ -234,12 +234,6 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
       }
     }
   }
-  std::cout << "dydx1" << std::endl;
-  std::cout << data->dydx1 << std::endl;
-
-  std::cout << "dydx2" << std::endl;
-  std::cout << data->dydx2 << std::endl;
-
   if (def.approx_derivates) {
     ::Eigen::Matrix<T, ::Eigen::Dynamic, ::Eigen::Dynamic> dydx1_rowise = data->dydx1;
     dydx1_rowise.transposeInPlace();
@@ -260,9 +254,6 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
         data->d2ydx1dx2(n1, n2) = _double_prime(def, func, n1, n2);
     }
   }
-
-  std::cout << "d2ydx1dx2" << std::endl;
-  std::cout << data->d2ydx1dx2 << std::endl;
 }
 
 template <typename T> T BicubicSplines<T>::evaluate(T x0, T x1) const {
