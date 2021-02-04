@@ -54,7 +54,7 @@ template <typename T> T LinAxis<T>::back_transform(T x) const {
 }
 
 template <typename T> T LinAxis<T>::derive(T) const { return 1. / this->stepsize; }
-template <typename T> T LinAxis<T>::back_derive(T x) const { return this->stepsize; }
+template <typename T> T LinAxis<T>::back_derive(T) const { return this->stepsize; }
 
 namespace cubic_splines {
 template class Axis<double>;

@@ -173,7 +173,7 @@ T BicubicSplines<T>::_double_prime(Definition const &def, T1 func, unsigned int 
     return finite_difference_derivative([&f_x1, t2](T t1) { return f_x1(t1, t2); },
                                         static_cast<T>(n1));
   };
-  auto dydx1_x2 = [&dydx1, n1, ax = def.axis[1].get()](T t2) {
+  auto dydx1_x2 = [&dydx1, ax = def.axis[1].get()](T t2) {
     return dydx1(ax->back_transform(t2));
   };
   return finite_difference_derivative(dydx1_x2, static_cast<T>(n2));
