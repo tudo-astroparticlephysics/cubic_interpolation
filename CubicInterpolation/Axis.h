@@ -62,6 +62,11 @@ public:
   auto GetHigh() const noexcept { return high; }
 
   /**
+   * @brief Stepsize of axis.
+   */
+  auto GetStepsize() const noexcept { return stepsize; }
+
+  /**
    * @brief Derivate of the Axis forward transformation.
    */
   virtual T derive(T x) const = 0;

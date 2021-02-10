@@ -8,10 +8,7 @@ Axis<T>::Axis(T _low, T _high, T _stepsize)
     : low(_low), high(_high), stepsize(_stepsize) {}
 
 template <typename T> unsigned int Axis<T>::required_nodes() const {
-  auto nodes = transform(high);
-  if (std::floor(nodes) == nodes)
-    return nodes + 1;
-  return nodes + 2;
+  return std::round(transform(high) + 1u);
 }
 
 template <typename T>
@@ -19,7 +16,7 @@ ExpAxis<T>::ExpAxis(T _low, T _high, T _stepsize) : Axis<T>(_low, _high, _stepsi
 
 template <typename T>
 ExpAxis<T>::ExpAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
-  this->stepsize = std::log(_high / _low) / (_nodes - 1);
+  this->stepsize = std::log(_high / _low) / static_cast<T>(_nodes - 1);
 }
 
 template <typename T> T ExpAxis<T>::transform(T x) const {
@@ -42,7 +39,7 @@ LinAxis<T>::LinAxis(T _low, T _high, T _stepsize) : Axis<T>(_low, _high, _stepsi
 
 template <typename T>
 LinAxis<T>::LinAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
-  this->stepsize = (_high - _low) / (_nodes - 1);
+  this->stepsize = (_high - _low) / static_cast<T>(_nodes - 1);
 }
 
 template <typename T> T LinAxis<T>::transform(T x) const {
