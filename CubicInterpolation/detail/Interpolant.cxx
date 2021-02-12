@@ -14,7 +14,7 @@ double _find_parameter(std::function<double(double)> const &f,
   auto tol = [](double min, double max) { return (std::abs(max - min) < 1.e-2) ? true : false; };
   std::tie(low, high) = boost::math::tools::bisect(f, low, high, tol); 
 
-  return = boost::math::tools::newton_raphson_iterate(func, (low + high)/2, low, high, 20);
+  return boost::math::tools::newton_raphson_iterate(func, (low + high)/2, low, high, 20);
 }
 } // namespace detail
 } // namespace cubic_splines
