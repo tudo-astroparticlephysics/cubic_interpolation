@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 
+#include "CubicInterpolation/version.h"
 #include "CubicInterpolation/Axis.h"
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
@@ -9,8 +10,10 @@
 double func(double x) { return x * x + x; }
 
 int main(int argc, char *argv[]) {
+
   if (argc != 2) {
-    std::cout << "Usage: 1dim_example POINT\n\n  POINT     point to evaluate "
+    std::cout << "Cubic Interpolation (version " << getCubicInterpolationVersion()
+              << ") \nUsage: 1dim_example POINT\n\n  POINT     point to evaluate "
               << "the function\n\n";
     return 0;
   }

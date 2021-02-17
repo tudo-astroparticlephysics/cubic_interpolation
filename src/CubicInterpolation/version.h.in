@@ -1,0 +1,17 @@
+#include <string>
+
+inline std::string getCubicInterpolationVersion() {
+  return "@CubicInterpolation_VERSION@";
+}
+inline unsigned getCubicInterpolationVersionMajor() {
+  return @CubicInterpolation_VERSION_MAJOR@;
+}
+inline unsigned getCubicInterpolationVersionMinor() {
+  return @CubicInterpolation_VERSION_MINOR@+0;
+}
+inline unsigned getCubicInterpolationVersionPatch() {
+  return @CubicInterpolation_VERSION_PATCH@+0;
+}
+inline unsigned getCubicInterpolationVersionTweak() {
+  return @CubicInterpolation_VERSION_TWEAK@+0;
+}

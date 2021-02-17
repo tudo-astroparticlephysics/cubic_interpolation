@@ -1,4 +1,4 @@
-#include "../InterpolantBuilder.h"
+#include "CubicInterpolation/InterpolantBuilder.h"
 
 #include <boost/math/differentiation/finite_difference.hpp>
 #include <Eigen/Dense>

@@ -1,5 +1,5 @@
-#include "../BicubicSplines.h"
-#include "../InterpolantBuilder.h"
+#include "CubicInterpolation/BicubicSplines.h"
+#include "CubicInterpolation/InterpolantBuilder.h"
 
 #include <Eigen/Dense>
 #include <boost/math/differentiation/finite_difference.hpp>

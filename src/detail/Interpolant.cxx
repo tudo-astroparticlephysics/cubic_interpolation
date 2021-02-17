@@ -1,4 +1,4 @@
-#include "../Interpolant.h"
+#include "CubicInterpolation/Interpolant.h"
 
 #include <boost/math/tools/roots.hpp>
 

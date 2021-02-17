@@ -1,6 +1,6 @@
 #pragma once
 
-#include "detail/Interpolant.hpp"
+#include "CubicInterpolation/Interpolant.hpp"
 
 #include <string>
 #include <type_traits>

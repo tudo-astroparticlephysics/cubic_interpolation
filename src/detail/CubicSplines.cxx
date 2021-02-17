@@ -1,5 +1,5 @@
-#include "../CubicSplines.h"
-#include "../InterpolantBuilder.h"
+#include "CubicInterpolation/CubicSplines.h"
+#include "CubicInterpolation/InterpolantBuilder.h"
 
 #include <boost/math/differentiation/finite_difference.hpp>
 #include <boost/math/interpolators/cardinal_cubic_b_spline.hpp>
