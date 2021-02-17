@@ -17,10 +17,13 @@ install(TARGETS CubicInterpolation EXPORT CubicInterpolationTargets
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CubicInterpolation
     )
 
+export(EXPORT CubicInterpolationTargets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationTargets.cmake")
+
 install(EXPORT CubicInterpolationTargets
     FILE CubicInterpolationTargets.cmake
     NAMESPACE CubicInterpolation::
-    DESTINATION lib/cmake/CubicInterpolation
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation
     )
 
 include(CMakePackageConfigHelpers)
@@ -34,6 +37,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation
     )
 
-export(EXPORT CubicInterpolationTargets
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationTargets.cmake"
-    )
+file(GLOB_RECURSE TEST_FILES "${PROJECT_BINARY_DIR}/Find*.cmake")
+
+install(FILES ${TEST_FILES}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation)

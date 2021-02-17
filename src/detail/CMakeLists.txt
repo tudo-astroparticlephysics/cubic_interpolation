@@ -12,9 +12,8 @@ find_package(Boost REQUIRED serialization filesystem)
 find_package(Eigen3 REQUIRED NO_MODULE)
 
 target_link_libraries(CubicInterpolation
-    PUBLIC
-    Eigen3::Eigen
     PRIVATE
+    Eigen3::Eigen
     Boost::serialization
     Boost::filesystem
     )
