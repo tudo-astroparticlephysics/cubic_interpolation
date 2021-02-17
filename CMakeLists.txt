@@ -16,8 +16,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
 set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
 
 add_subdirectory(src)
-add_subdirectory(example)
-# add_subdirectory(docs)
+
+option(BUILD_EXAMPLE "build example" OFF)
+if(BUILD_EXAMPLE)
+    add_subdirectory(example)
+endif()
+
+option(BUILD_DOCUMENTATION "build documentation" OFF)
+if(BUILD_DOCUMENTATION)
+    add_subdirectory(docs)
+endif()
 
 # if(BUILD_TESTING)
 #     include(googletest)
