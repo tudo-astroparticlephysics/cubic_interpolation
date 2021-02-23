@@ -6,6 +6,16 @@ add_library(CubicInterpolation::CubicInterpolation ALIAS CubicInterpolation)
 add_subdirectory(CubicInterpolation)
 add_subdirectory(detail)
 
+find_package(Boost REQUIRED serialization filesystem)
+find_package(Eigen3 REQUIRED Eigen)
+
+target_link_libraries(CubicInterpolation
+    PRIVATE
+    Eigen3::Eigen
+    Boost::serialization
+    Boost::filesystem
+    )
+
 target_include_directories(CubicInterpolation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -14,6 +24,7 @@ target_include_directories(CubicInterpolation PUBLIC
 
 install(TARGETS CubicInterpolation EXPORT CubicInterpolationTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CubicInterpolation
     )
 

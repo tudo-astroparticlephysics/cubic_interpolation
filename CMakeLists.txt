@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.9)
 
 project(CubicInterpolation LANGUAGES CXX)
 
@@ -27,8 +27,7 @@ if(BUILD_DOCUMENTATION)
     add_subdirectory(docs)
 endif()
 
-# if(BUILD_TESTING)
-#     include(googletest)
-#     enable_testing()
-#     add_subdirectory(tests)
-# endif()
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
