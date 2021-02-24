@@ -1,7 +1,6 @@
 #include "CubicInterpolation/Axis.h"
 #include "CubicInterpolation/BicubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
-#include "CubicInterpolation/detail/BicubicSplines.cxx"
 #include "gtest/gtest.h"
 #include <array>
 #include <cmath>

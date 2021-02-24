@@ -1,4 +1,4 @@
-#include "../Axis.h"
+#include "CubicInterpolation/Axis.h"
 #include <cmath>
 
 using namespace cubic_splines;

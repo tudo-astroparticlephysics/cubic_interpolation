@@ -1,3 +1,5 @@
+find_package(CubicInterpolation)
+
 add_executable(1dim_example 1dim_example.cxx)
 target_link_libraries(1dim_example CubicInterpolation::CubicInterpolation)
 
