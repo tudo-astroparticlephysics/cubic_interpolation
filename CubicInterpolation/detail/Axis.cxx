@@ -16,15 +16,15 @@ ExpAxis<T>::ExpAxis(T _low, T _high, T _stepsize) : Axis<T>(_low, _high, _stepsi
 
 template <typename T>
 ExpAxis<T>::ExpAxis(T _low, T _high, size_t _nodes) : Axis<T>(_low, _high, 0.f) {
-  this->stepsize = std::log(_high / (2. * _low) + 0.5) / static_cast<T>(_nodes - 1);
+  this->stepsize = (std::log1p(_high / _low) - M_LN2) / static_cast<T>(_nodes - 1);
 }
 
 template <typename T> T ExpAxis<T>::transform(T x) const {
-  return std::log(x / (2. * this->low) + 0.5) / this->stepsize;
+  return (std::log1p(x / this->low) - M_LN2) / this->stepsize;
 }
 
 template <typename T> T ExpAxis<T>::back_transform(T t) const {
-  return this->low * ( 2. * std::exp(t * this->stepsize) - 1.);
+  return this->low * std::expm1(t * this->stepsize + M_LN2);
 }
 template <typename T> T ExpAxis<T>::derive(T x) const {
   return 1. / (this->stepsize * (x + this->low));
