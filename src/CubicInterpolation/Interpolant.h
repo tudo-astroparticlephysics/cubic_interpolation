@@ -56,7 +56,7 @@ public:
    * stored in same order as axis is required.
    */
   template <typename T> inline auto prime(T x) const {
-    auto f = evaluate(x);
+    auto f = inter.evaluate(transform(def.GetAxis(), x));
     auto df = inter.prime(transform(def.GetAxis(), x));
     return back_transform_prime(def.f_trafo.get(), def.GetAxis(), f, df, x);
   }
