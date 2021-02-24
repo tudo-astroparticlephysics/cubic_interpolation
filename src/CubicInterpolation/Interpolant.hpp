@@ -28,7 +28,7 @@ template <typename T> auto back_transform(T trafo, double val) {
 template <typename T>
 auto back_transform_prime(T trafo, Axis const &axis, double f, double df, double x) {
   if (trafo)
-    df *= f;
+    df *= trafo->back_derive(f);
   df *= axis.derive(x);
   return df;
 }
