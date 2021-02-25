@@ -103,10 +103,10 @@ TEST(CubicSplines, evaluate_exp_distributed_nodes) {
 
 TEST(CubicSplines, evaluate_log_func_values_and_axis) {
   size_t N = 3;
-  auto low = 1e1f;
+  auto low = 1e0f;
   auto high = 1e2f;
   auto def = spline_def_t();
-  auto func = [](double x) { return std::pow(x, 10); };
+  auto func = [](double x) { return std::pow(x+1, 10); };
   def.f = func;
   def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1, 0);
   def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(low, high, N);
