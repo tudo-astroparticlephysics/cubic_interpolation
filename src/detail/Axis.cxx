@@ -31,7 +31,7 @@ template <typename T> T ExpAxis<T>::derive(T x) const {
 }
 
 template <typename T> T ExpAxis<T>::back_derive(T t) const {
-  return 2. * this->low * this->stepsize * std::exp(t * this->stepsize);
+  return this->low * this->stepsize * std::exp(t * this->stepsize + M_LN2);
 }
 
 template <typename T>
