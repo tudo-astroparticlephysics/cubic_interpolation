@@ -106,7 +106,7 @@ TEST(CubicSplines, evaluate_log_func_values_and_axis) {
   auto low = 1e1f;
   auto high = 1e2f;
   auto def = spline_def_t();
-  auto func = [](double x) { return std::pow(10, x); };
+  auto func = [](double x) { return std::pow(x, 10); };
   def.f = func;
   def.f_trafo = std::make_unique<cubic_splines::ExpAxis<double>>(1, 0);
   def.axis = std::make_unique<cubic_splines::ExpAxis<double>>(low, high, N);
