@@ -289,3 +289,6 @@ template <typename T> T BicubicSplines<T>::double_prime(T x0, T x1) const {
       x0);
 }
 } // namespace cubic_splines
+
+template class cubic_splines::BicubicSplines<double>;
+template class cubic_splines::BicubicSplines<float>;
