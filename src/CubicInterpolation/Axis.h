@@ -81,7 +81,7 @@ template <typename T> std::ostream &operator<<(std::ostream &out, const Axis<T> 
 /**
  * @brief Exponential axis to interpolate over many different scales. As basis
  * the euler number choosen by default if no further specified. Nodes will
- * distributed in form of \f$ \exp(n \cdot \text{stepsize}) \f$
+ * distributed in form of \f$ \text{low} \cdot (\exp(n \cdot \text{stepsize} + \log(2)) - 1) \f$
  */
 template <typename T> class ExpAxis : public Axis<T> {
 
