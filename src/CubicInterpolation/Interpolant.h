@@ -68,15 +68,18 @@ public:
 };
 
 /**
- * @brief If the function value and the parameter except one are known, the
- * missing will be estimated.
+ * @brief Inverts the interpolation evaluation and searches the missing axis-
+ * for the given function-value. If a n > 1 dimensional interpolant is passed,
+ * the parameterspace must be narrowed. The function values except the searched
+ * dimension must be specified and a guess must be given in place of the
+ * container.
  *
  * @param interpolant interpolant object required for calculation
  * @param val function value
- * @param x doubleing point with initial guess if 1 dimensional, else iterable
- * container with ordered function values and in place guess for to estimate
- * variable
- * @param n if multidimensional interpolant, number which variable to estimate
+ * @param x axis values including guess of the parameter to estimate. If
+ * parameter to estimate is set to `nan`, the parameterspace for the missing
+ * axis value will be shrinked automatically the searched xaxis value.
+ * @param n (only if dim > 1) n-th axis to estimate the value
  */
 template <typename... Args> auto find_parameter(Args &&...args) {
   return detail::find_parameter(std::forward<Args>(args)...);

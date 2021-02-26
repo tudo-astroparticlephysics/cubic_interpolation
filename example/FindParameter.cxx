@@ -1,11 +1,12 @@
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 
+#include "CubicInterpolation/Axis.h"
 #include "CubicInterpolation/BicubicSplines.h"
 #include "CubicInterpolation/CubicSplines.h"
 #include "CubicInterpolation/Interpolant.h"
-#include "CubicInterpolation/Axis.h"
 
 double func1dim(double x) { return x * x + x; }
 double func2dim(double x, double y) { return x * x + y * y; }
@@ -14,9 +15,10 @@ int main() {
   auto def1d = cubic_splines::CubicSplines<double>::Definition();
   def1d.f = func1dim;
   def1d.axis = std::make_unique<cubic_splines::LinAxis<double>>(-2.f, 2.f, (size_t)10);
-  auto inter1d = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>(std::move(def1d), "", "");
+  auto inter1d = cubic_splines::Interpolant<cubic_splines::CubicSplines<double>>(
+      std::move(def1d), "", "");
   auto function_value = 1.f;
-  auto guess = 0.5f;
+  auto guess = 1.f;
 
   auto x = find_parameter(inter1d, function_value, guess);
   std::cout << "f(x) = " << function_value << " -> x = " << x << std::endl;
