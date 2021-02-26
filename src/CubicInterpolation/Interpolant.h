@@ -77,9 +77,8 @@ public:
  * @param interpolant interpolant object required for calculation
  * @param val function value
  * @param x axis values including guess of the parameter to estimate. If
- * parameter to estimate is set to one, the parameterspace for the missing axis
- * value will be shrinked automatically
- * the searched xaxis value
+ * parameter to estimate is set to `nan`, the parameterspace for the missing
+ * axis value will be shrinked automatically the searched xaxis value.
  * @param n (only if dim > 1) n-th axis to estimate the value
  */
 template <typename... Args> auto find_parameter(Args &&...args) {

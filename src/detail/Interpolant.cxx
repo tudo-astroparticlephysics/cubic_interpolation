@@ -1,6 +1,7 @@
 #include "CubicInterpolation/Interpolant.h"
 
 #include <boost/math/tools/roots.hpp>
+#include <cassert>
 
 namespace cubic_splines {
 namespace detail {
@@ -9,6 +10,7 @@ double _find_parameter(std::function<double(double)> const &f,
                        double initial_guess) {
   auto low = axis.GetLow();
   auto high = axis.GetHigh();
+  assert((low == high) && "find_parameter call is not well defined");
   auto func = [&f, &df](double x) { return std::make_tuple(f(x), df(x)); };
 
   if (std::isnan(initial_guess)) {
