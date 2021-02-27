@@ -15,7 +15,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
-
 add_subdirectory(src)
 
 option(BUILD_EXAMPLE "build example" OFF)

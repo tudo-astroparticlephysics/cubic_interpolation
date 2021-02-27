@@ -1,12 +1,21 @@
+dist: focal
+
 language: python
 
 python:
     - "3.6"
+
+before_install:
+    - sudo apt-get install libgtest-dev
+
 install:
     - pip3 install conan
     - conan profile new default --detect
     - conan profile update settings.compiler.libcxx=libstdc++11 default
-    - conan create . user/testing
+    - mkdir build && cd build
+    - conan install ..
+    - cmake .. -DBUILD_TESTING=ON
+    - make -j
 
 script:
-    - conan test tests/ CubicInterpolation/0.1@user/testing
+    - make test
