@@ -47,7 +47,5 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation
     )
 
-file(GLOB_RECURSE TEST_FILES "${PROJECT_BINARY_DIR}/Find*.cmake")
-
-install(FILES ${TEST_FILES}
+install(FILES "${PROJECT_BINARY_DIR}/conanbuildinfo.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation)
