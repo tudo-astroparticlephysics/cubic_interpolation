@@ -10,7 +10,7 @@ double _find_parameter(std::function<double(double)> const &f,
                        double initial_guess) {
   auto low = axis.GetLow();
   auto high = axis.GetHigh();
-  assert((low >= high) && "find_parameter call is not well defined");
+  assert(((void)"find_parameter call is not well defined", low < high));
   auto func = [&f, &df](double x) { return std::make_tuple(f(x), df(x)); };
 
   if (std::isnan(initial_guess)) {

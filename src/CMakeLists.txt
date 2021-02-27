@@ -3,17 +3,16 @@ include(GNUInstallDirs)
 add_library(CubicInterpolation)
 add_library(CubicInterpolation::CubicInterpolation ALIAS CubicInterpolation)
 
+set_target_properties(CubicInterpolation PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    )
+
 add_subdirectory(CubicInterpolation)
 add_subdirectory(detail)
 
-find_package(Boost REQUIRED serialization filesystem)
-find_package(Eigen3 REQUIRED Eigen)
-
 target_link_libraries(CubicInterpolation
-    PRIVATE
-    Eigen3::Eigen
-    Boost::serialization
-    Boost::filesystem
+    CONAN_PKG::eigen
+    CONAN_PKG::boost
     )
 
 target_include_directories(CubicInterpolation PUBLIC
