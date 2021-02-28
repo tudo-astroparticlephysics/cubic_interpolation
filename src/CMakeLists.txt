@@ -3,10 +3,6 @@ include(GNUInstallDirs)
 add_library(CubicInterpolation)
 add_library(CubicInterpolation::CubicInterpolation ALIAS CubicInterpolation)
 
-set_target_properties(CubicInterpolation PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-    )
-
 add_subdirectory(CubicInterpolation)
 add_subdirectory(detail)
 
