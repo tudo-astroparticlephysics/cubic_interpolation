@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
 project(CubicInterpolation LANGUAGES CXX)
 
 set(CubicInterpolation_VERSION_MAJOR 0)
 set(CubicInterpolation_VERSION_MINOR 1)
-set(CubicInterpolation_VERSION_PATCH 0)
+set(CubicInterpolation_VERSION_PATCH 3)
 set(CubicInterpolation_VERSION ${CubicInterpolation_VERSION_MAJOR}.${CubicInterpolation_VERSION_MINOR}.${CubicInterpolation_VERSION_PATCH})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)

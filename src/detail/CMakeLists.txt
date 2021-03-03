@@ -1,7 +1,7 @@
 target_sources(CubicInterpolation PRIVATE
-    Axis.cxx
-    BicubicSplines.cxx
-    CubicSplines.cxx
-    InterpolantBuilder.cxx
-    Interpolant.cxx
+    ${CMAKE_CURRENT_LIST_DIR}/Axis.cxx
+    ${CMAKE_CURRENT_LIST_DIR}/BicubicSplines.cxx
+    ${CMAKE_CURRENT_LIST_DIR}/CubicSplines.cxx
+    ${CMAKE_CURRENT_LIST_DIR}/InterpolantBuilder.cxx
+    ${CMAKE_CURRENT_LIST_DIR}/Interpolant.cxx
     )
