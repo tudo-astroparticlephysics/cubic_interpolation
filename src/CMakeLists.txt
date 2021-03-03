@@ -3,6 +3,10 @@ include(GNUInstallDirs)
 add_library(CubicInterpolation)
 add_library(CubicInterpolation::CubicInterpolation ALIAS CubicInterpolation)
 
+if(MSVC)
+    target_compile_definitions(CubicInterpolation PRIVATE _USE_MATH_DEFINES)
+endif()
+
 add_subdirectory(CubicInterpolation)
 add_subdirectory(detail)
 

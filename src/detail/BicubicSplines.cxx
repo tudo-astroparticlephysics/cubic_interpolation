@@ -58,7 +58,10 @@ template <typename T> struct BicubicSplines<T>::RuntimeData {
     return ::std::vector<T>(m.data(), m.data() + m.rows() * m.cols());
   }
 
-  auto get_dimensions() const { return std::array<long int, 2>{y.rows(), y.cols()}; }
+  auto get_dimensions() const {
+    return std::array<long int, 2>{static_cast<long int>(y.rows()),
+                                   static_cast<long int>(y.cols())};
+  }
 
   StorageData to_storage_data() const;
 };

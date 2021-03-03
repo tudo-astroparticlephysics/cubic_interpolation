@@ -34,7 +34,7 @@ T2 load(fs::path path, fs::path filename) {
 };
 
 template <typename T> bool save(T const &storage_data, fs::path path, fs::path filename) {
-  if (not fs::exists(path / filename)) {
+  if (!fs::exists(path / filename)) {
     std::ofstream ofs((path / filename).c_str());
     while (ofs.good()) {
       boost::archive::binary_oarchive oa(ofs);
