@@ -20,7 +20,7 @@ int main() {
   auto function_value = 1.f;
   auto guess = 1.f;
 
-  auto x = find_parameter(inter1d, function_value, guess);
+  auto x = find_parameter(inter1d, function_value, guess, NAN, NAN);
   std::cout << "f(x) = " << function_value << " -> x = " << x << std::endl;
 
   auto def2d = cubic_splines::BicubicSplines<double>::Definition();
@@ -34,7 +34,7 @@ int main() {
   auto y_guess = 3.f;
   auto searched_param = 1;
   auto y = cubic_splines::find_parameter(inter2d, function_value,
-                    std::array<double, 2>{x_val, y_guess}, std::nan, std::nan, searched_param);
+                    std::array<double, 2>{x_val, y_guess}, NAN, NAN, searched_param);
   std::cout << "f(x="<< x_val <<",y) = " << function_value << " -> y = " << y << std::endl;
   return 0;
 }
