@@ -79,6 +79,10 @@ public:
  * @param x axis values including guess of the parameter to estimate. If
  * parameter to estimate is set to `nan`, the parameterspace for the missing
  * axis value will be shrinked automatically the searched xaxis value.
+ * @param low lower limit of parameter to estimate. If set to `nan`, lowest
+ * possible boundary (given by axis) will be assumed
+ * @param high upper limit of parameter to estimate. If set to `nan`,
+ * highest possible boundary (given by axis) will be used
  * @param n (only if dim > 1) n-th axis to estimate the value
  */
 template <typename... Args> auto find_parameter(Args &&...args) {

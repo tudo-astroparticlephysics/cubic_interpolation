@@ -7,9 +7,11 @@ namespace cubic_splines {
 namespace detail {
 double _find_parameter(std::function<double(double)> const &f,
                        std::function<double(double)> const &df, Axis const &axis,
-                       double initial_guess) {
-  auto low = axis.GetLow();
-  auto high = axis.GetHigh();
+                       double initial_guess, double low, double high) {
+  if (std::isnan(low))
+    low = axis.GetLow();
+  if (std::isnan(high))
+    high = axis.GetHigh();
   assert(((void)"find_parameter call is not well defined", low < high));
   auto func = [&f, &df](double x) { return std::make_tuple(f(x), df(x)); };
 
