@@ -23,7 +23,7 @@ TEST(find_parameter, CubicSplines) {
     auto x = xaxis.back_transform(dis(gen));
     auto f = func(x);
     // search y falue for given f, x value.
-    auto x_guess = cubic_splines::find_parameter(spline, f, 0.5f);
+    auto x_guess = cubic_splines::find_parameter(spline, f, 0.5f, std::nan, std::nan);
     EXPECT_NEAR(x, x_guess, std::max(std::abs(x) * 1e-2, 1e-3));
   }
 }
@@ -45,7 +45,7 @@ TEST(find_parameter, BicubicSplines) {
     auto y = yaxis.back_transform(dis(gen));
     auto f = func(x, y);
     // search y falue for given f, x value.
-    auto y_guess = cubic_splines::find_parameter(spline, f, std::array<double, 2>{x, 0.5f}, 1);
+    auto y_guess = cubic_splines::find_parameter(spline, f, std::array<double, 2>{x, 0.5f}, std::nan, std::nan, 1);
     EXPECT_NEAR(y, y_guess, std::max(std::abs(y) * 1e-2, 1e-3));
   }
 }
