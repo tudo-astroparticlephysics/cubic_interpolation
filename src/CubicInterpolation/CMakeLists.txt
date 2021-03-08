@@ -6,6 +6,7 @@ set (CubicInterpolation_header
     CubicInterpolation/BicubicSplines.h
     CubicInterpolation/CMakeLists.txt
     CubicInterpolation/CubicSplines.h
+    CubicInterpolation/FindParameter.hpp
     CubicInterpolation/Interpolant.h
     CubicInterpolation/Interpolant.hpp
     CubicInterpolation/InterpolantBuilder.h
