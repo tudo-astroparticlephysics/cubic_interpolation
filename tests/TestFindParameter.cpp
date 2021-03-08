@@ -48,7 +48,7 @@ TEST(find_parameter, BicubicSplines) {
     auto x = xaxis.back_transform(dis(gen));
     auto y = yaxis.back_transform(dis(gen));
     auto f = func(x, y);
-    // search y falue for given f, x value.
+    // search y value for given f, x value.
     auto guess = cubic_splines::ParameterGuess<std::array<double, 2>>{
         .x = std::array<double, 2>{x, 0.5f}, .n = 1, .lower = NAN, .upper = NAN};
     auto y_guess = cubic_splines::find_parameter(spline, f, guess);
