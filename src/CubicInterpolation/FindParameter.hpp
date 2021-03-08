@@ -7,15 +7,23 @@
 #include <type_traits>
 
 namespace cubic_splines {
+/**
+ * @brief Object to limit the parameter range of the parameter to be searched for.
+ *
+ * @tparam T Type of the x values.
+ */
 template <typename T> struct ParameterGuess {
-  T x;
-  size_t n = 0;
-  double lower = NAN;
-  double upper = NAN;
+  T x; // parameter list including a guess for the parameter to search for. If there is no
+       // suggestion for the variable to be minimized, it must be set to NAN and it will
+       // be searched automatically.
+  size_t n = 0;       // dimension to find the parameter
+  double lower = NAN; // lower limit from the searched parameter
+  double upper = NAN; // upper limit from the searched parameter
 };
+} // namespace cubic_splines
 
+namespace cubic_splines {
 namespace detail {
-
 template <typename T, typename = void> struct is_iterable : std::false_type {};
 
 template <typename T>
@@ -69,24 +77,19 @@ auto find_parameter(std::function<double(double)> f, std::function<double(double
   return _find_parameter(f, df, guess.x, guess.lower, guess.upper);
 };
 } // namespace detail
+} // namespace cubic_splines
 
+namespace cubic_splines {
 /**
  * @brief Inverts the interpolation evaluation and searches the missing axis-
  * for the given function-value. If a n > 1 dimensional interpolant is passed,
- * the parameterspace must be narrowed. The function values except the searched
- * dimension must be specified and a guess must be given in place of the
- * container.
+ * the parameterspace must be narrowed.
  *
- * @param interpolant interpolant object required for calculation
+ * @tparam T1 interpolant type
+ * @tparam T2 x value type
+ * @param inter interpolant object required for calculation
  * @param val function value
- * @param x axis values including guess of the parameter to estimate. If
- * parameter to estimate is set to `nan`, the parameterspace for the missing
- * axis value will be shrinked automatically the searched xaxis value.
- * @param low lower limit of parameter to estimate. If set to `nan`, lowest
- * possible boundary (given by axis) will be assumed
- * @param high upper limit of parameter to estimate. If set to `nan`,
- * highest possible boundary (given by axis) will be used
- * @param n (only if dim > 1) n-th axis to estimate the value
+ * @param guess a parameter guess
  */
 template <typename T1, typename T2>
 auto find_parameter(T1 const &inter, double val, ParameterGuess<T2> guess) {
