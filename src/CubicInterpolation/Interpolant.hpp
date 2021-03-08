@@ -40,29 +40,5 @@ auto back_transform_prime(T1 trafo, T2 const &axis, double f, T3 df, T3 x) {
   return df;
 }
 
-double _find_parameter(std::function<double(double)> const &f,
-                       std::function<double(double)> const &df, Axis const &axis,
-                       double initial_guess);
-
-template <typename T1>
-auto find_parameter(T1 const &inter, double val, double initial_guess) {
-  auto f = [&inter, val](double xi) { return inter.evaluate(xi) - val; };
-  auto df = [&inter](double xi) { return inter.prime(xi); };
-  return _find_parameter(f, df, *inter.GetDefinition().axis, initial_guess);
-};
-
-template <typename T> auto updated_val(T &x, size_t n, double xi) {
-  x[n] = xi;
-  return x;
-}
-
-template <typename T1, typename T2>
-auto find_parameter(T1 const &inter, double val, T2 x, size_t n) {
-  auto f = [&inter, val, &x, n](double xi) {
-    return inter.evaluate(updated_val(x, n, xi)) - val;
-  };
-  auto df = [&inter, &x, n](double xi) { return inter.prime(updated_val(x, n, xi))[n]; };
-  return _find_parameter(f, df, *inter.GetDefinition().axis[n], x[n]);
-}
 } // namespace detail
 } // namespace cubic_splines
