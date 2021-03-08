@@ -24,10 +24,13 @@ template <typename T> struct ParameterGuess {
 
 namespace cubic_splines {
 namespace detail {
-template <typename T, typename = void> struct is_iterable : std::false_type {};
 
+template<typename... Ts> struct make_void { typedef void type;};
+template<typename... Ts> using void_t = typename make_void<Ts...>::type;
+
+template <typename T, typename = void> struct is_iterable : std::false_type {};
 template <typename T>
-struct is_iterable<T, std::void_t<decltype(std::declval<T>().begin()),
+struct is_iterable<T, void_t<decltype(std::declval<T>().begin()),
                                   decltype(std::declval<T>().end())>> : std::true_type {};
 
 template <typename T1, typename T2, std::enable_if_t<is_iterable<T1>::value, bool> = true>
