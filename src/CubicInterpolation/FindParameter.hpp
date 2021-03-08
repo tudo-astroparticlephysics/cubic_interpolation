@@ -15,10 +15,15 @@ template <typename T> struct ParameterGuess {
 };
 
 namespace detail {
-template <typename T1, typename T2,
-          std::enable_if_t<std::is_array<T1>::value, bool> = true>
-auto PopulateParameterGuess(cubic_splines::ParameterGuess<T1> &guess,
-                            T2 const &ax) {
+
+template <typename T, typename = void> struct is_iterable : std::false_type {};
+
+template <typename T>
+struct is_iterable<T, std::void_t<decltype(std::declval<T>().begin()),
+                                  decltype(std::declval<T>().end())>> : std::true_type {};
+
+template <typename T1, typename T2, std::enable_if_t<is_iterable<T1>::value, bool> = true>
+auto PopulateParameterGuess(cubic_splines::ParameterGuess<T1> &guess, T2 const &ax) {
   if (std::isnan(guess.lower))
     guess.lower = ax[guess.n]->GetLow();
   if (std::isnan(guess.upper))
@@ -27,33 +32,35 @@ auto PopulateParameterGuess(cubic_splines::ParameterGuess<T1> &guess,
 
 template <typename T1, typename T2,
           std::enable_if_t<std::is_floating_point<T1>::value, bool> = true>
-auto PopulateParameterGuess(cubic_splines::ParameterGuess<T1> &guess,
-                            T2 const &ax) {
+auto PopulateParameterGuess(cubic_splines::ParameterGuess<T1> &guess, T2 const &ax) {
   if (std::isnan(guess.lower))
     guess.lower = ax.GetLow();
   if (std::isnan(guess.upper))
     guess.upper = ax.GetHigh();
 }
 
-
-template <typename T, std::enable_if_t<std::is_array<T>::value, bool> = true>
+template <typename T, std::enable_if_t<is_iterable<T>::value, bool> = true>
 auto updated_val(T &x, size_t n, double xi) {
-  return x[n] = xi;
+  x[n] = xi;
+  return x;
 }
 
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
 auto updated_val(T &x, size_t n, double xi) {
-  return x = xi;
+  x = xi;
+  return x;
 }
 
 double _find_parameter(std::function<double(double)> const &f,
                        std::function<double(double)> const &df, double x_guess,
                        double lower, double upper);
 
-template <typename T, std::enable_if_t<std::is_array<T>::value, bool> = true>
-auto find_parameter(std::function<double(double)> f, std::function<T(double)> df,
+template <typename T, typename T2, std::enable_if_t<is_iterable<T>::value, bool> = true>
+auto find_parameter(std::function<double(double)> f, T2 df,
                     cubic_splines::ParameterGuess<T> guess) {
-  return _find_parameter(f, df[guess.n], guess.x[guess.n], guess.lower, guess.upper);
+  return _find_parameter(
+      f, [df, n = guess.n](double x) { return df(x)[n]; }, guess.x[guess.n], guess.lower,
+      guess.upper);
 };
 
 template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
