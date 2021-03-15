@@ -95,4 +95,6 @@ template class LinAxis<double>;
 template class LinAxis<float>;
 template class ExpAxis<double>;
 template class ExpAxis<float>;
+template class ExpM1Axis<double>;
+template class ExpM1Axis<float>;
 } // namespace cubic_splines
