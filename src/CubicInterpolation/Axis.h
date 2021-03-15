@@ -81,7 +81,7 @@ template <typename T> std::ostream &operator<<(std::ostream &out, const Axis<T> 
 /**
  * @brief Exponential axis to interpolate over many different scales. As basis
  * the euler number choosen by default if no further specified. Nodes will
- * distributed in form of \f$ \text{low} \cdot (\exp(n \cdot \text{stepsize} + \log(2)) - 1) \f$
+ * distributed in form of \f$ \exp(n \cdot \text{stepsize}) \f$
  */
 template <typename T> class ExpAxis : public Axis<T> {
 
@@ -101,6 +101,32 @@ public:
    * @brief Exponential Axis initialized with number of nodes.
    */
   ExpAxis(T _low, T _high, size_t _nodes);
+
+  T transform(T x) const final;
+  T back_transform(T t) const final;
+
+  T derive(T x) const final;
+  T back_derive(T t) const final;
+};
+
+/**
+ * @brief Exponential axis to interpolate over many different scales. As basis
+ * the euler number choosen by default if no further specified. Nodes will
+ * distributed in form of \f$ \text{low} \cdot (\exp(n \cdot \text{stepsize} + \log(2)) -
+ * 1) \f$
+ */
+template <typename T> class ExpM1Axis : public Axis<T> {
+
+  void print(std::ostream &os) const {
+    os << "ExpM1Axis(";
+    Axis<T>::print(os);
+    os << ")";
+  }
+
+public:
+  ExpM1Axis(T _low, T _high, T _stepsize = 1);
+
+  ExpM1Axis(T _low, T _high, size_t _nodes);
 
   T transform(T x) const final;
   T back_transform(T t) const final;
