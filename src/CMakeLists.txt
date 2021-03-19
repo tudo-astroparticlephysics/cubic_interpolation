@@ -10,10 +10,12 @@ endif()
 add_subdirectory(CubicInterpolation)
 add_subdirectory(detail)
 
-target_link_libraries(CubicInterpolation
-    CONAN_PKG::eigen
-    CONAN_PKG::boost
-    )
+target_link_libraries(CubicInterpolation PUBLIC
+    Eigen3::Eigen
+    Boost::boost
+)
+get_target_property(INCS Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "EIGEN INCLUDE ${INCS}")
 
 target_include_directories(CubicInterpolation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -43,9 +45,6 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
     )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
+install( FILES ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation
-    )
-
-install(FILES "${PROJECT_BINARY_DIR}/conanbuildinfo.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation)
+)

@@ -13,8 +13,8 @@ install:
     - conan profile new default --detect
     - conan profile update settings.compiler.libcxx=libstdc++11 default
     - mkdir build && cd build
-    - conan install ..
-    - cmake .. -DBUILD_TESTING=ON
+    - conan install .. -s build_type=Release
+    - cmake .. -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release
     - make -j
 
 script:
