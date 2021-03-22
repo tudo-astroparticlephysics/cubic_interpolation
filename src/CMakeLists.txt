@@ -13,6 +13,8 @@ add_subdirectory(detail)
 target_link_libraries(CubicInterpolation PUBLIC
     Eigen3::Eigen
     Boost::boost
+    Boost::filesystem
+    Boost::serialization
 )
 get_target_property(INCS Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
 message(STATUS "EIGEN INCLUDE ${INCS}")

@@ -3,8 +3,11 @@ cmake_minimum_required(VERSION 3.12)
 project(CubicInterpolation LANGUAGES CXX)
 
 # To find conan files created in build directory
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_BINARY_DIR}")
+list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}")
+
+message(STATUS ${CMAKE_PREFIX_PATH})
+message(STATUS ${CMAKE_MODULE_PATH})
 
 set(CubicInterpolation_VERSION_MAJOR 0)
 set(CubicInterpolation_VERSION_MINOR 1)
