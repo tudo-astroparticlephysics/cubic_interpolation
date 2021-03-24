@@ -24,7 +24,7 @@ class CubicInterpolationConan(ConanFile):
     }
 
     exports_sources = "*"
-    generators = "cmake_find_package", "cmake_find_package_multi"
+    generators = "cmake_find_package", "cmake_paths"
     _cmake = None
 
     # def config_options(self):

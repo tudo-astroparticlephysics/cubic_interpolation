@@ -1,5 +1,9 @@
 @PACKAGE_INIT@
 
+if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+endif()
+
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
 
