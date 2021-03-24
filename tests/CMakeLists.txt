@@ -13,13 +13,13 @@ set(Libs
 # gtest_discover_tests(TestAxis)
 
 add_executable(TestCubicSplines TestCubicSplines.cpp)
-target_link_libraries(TestCubicSplines ${Libs})
+target_link_libraries(TestCubicSplines PRIVATE ${Libs})
 gtest_discover_tests(TestCubicSplines)
 
 add_executable(TestBicubicSplines TestBicubicSplines.cpp)
-target_link_libraries(TestBicubicSplines ${Libs})
+target_link_libraries(TestBicubicSplines PRIVATE ${Libs})
 gtest_discover_tests(TestBicubicSplines)
 
 add_executable(TestFindParameter TestFindParameter.cpp)
-target_link_libraries(TestFindParameter ${Libs})
+target_link_libraries(TestFindParameter PRIVATE ${Libs})
 gtest_discover_tests(TestFindParameter)
