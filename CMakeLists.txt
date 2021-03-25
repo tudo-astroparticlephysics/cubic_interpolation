@@ -17,7 +17,7 @@ set(CubicInterpolation_VERSION ${CubicInterpolation_VERSION_MAJOR}.${CubicInterp
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(Eigen3 REQUIRED)
-find_package(Boost COMPONENTS filesystem math serialization REQUIRED)
+find_package(Boost COMPONENTS filesystem serialization REQUIRED)
 
 add_subdirectory(src)
 

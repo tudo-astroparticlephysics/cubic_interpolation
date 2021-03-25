@@ -50,3 +50,5 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
 file(GLOB CMAKE_FILES "${CMAKE_BINARY_DIR}/*.cmake")
 install(FILES ${CMAKE_FILES} DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake 
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation)
