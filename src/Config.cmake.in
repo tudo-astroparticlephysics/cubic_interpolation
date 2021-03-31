@@ -1,6 +1,10 @@
 @PACKAGE_INIT@
 
-include(${CMAKE_CURRENT_LIST_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+endif()
+
+find_package(Eigen3 REQUIRED)
+find_package(Boost COMPONENTS filesystem serialization REQUIRED)
 
 include ("${CMAKE_CURRENT_LIST_DIR}/CubicInterpolationTargets.cmake")

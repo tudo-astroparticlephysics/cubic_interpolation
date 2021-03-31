@@ -19,21 +19,21 @@ class CubicInterpolationConan(ConanFile):
         "fPIC": [True, False],
     }
     default_options = {
-        "shared": False,
+        "shared": True,
         "fPIC": True
     }
 
     exports_sources = "*"
-    generators = "cmake"
+    generators = "cmake_find_package", "cmake_paths"
     _cmake = None
 
-    def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
+    # def config_options(self):
+    #     if self.settings.os == "Windows":
+    #         del self.options.fPIC
 
-    def configure(self):
-        if self.options.shared:
-            del self.options.fPIC
+    # def configure(self):
+    #     if self.options.shared:
+    #         del self.options.fPIC
 
     def requirements(self):
         self.requires("boost/1.75.0")
