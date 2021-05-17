@@ -1,11 +1,12 @@
 find_package(Doxygen QUIET)
 
-set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR}/CubicInterpolation)
+set(DOXYGEN_INPUT_DIR ${PROJECT_SOURCE_DIR}/src/CubicInterpolation)
 set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
 set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
 set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-file(GLOB_RECURSE CUBIC_INTERPOLATION_HEADERS ../CubicInterpolation/*.h)
+file(GLOB_RECURSE CUBIC_INTERPOLATION_HEADERS ${DOXYGEN_INPUT_DIR}/*.h)
+message(STATUS "headers: ${CUBIC_INTERPOLATION_HEADERS}")
 
 configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
@@ -17,7 +18,7 @@ add_custom_target(Doxygen
     COMMENT "Generating Doxygen docs"
     VERBATIM)
 
-
+include("${CMAKE_CURRENT_SOURCE_DIR}/FindSphinx.cmake")
 find_package(Sphinx QUIET)
 
 set(SPHINX_CONF ${CMAKE_CURRENT_SOURCE_DIR})
@@ -29,7 +30,7 @@ file(GLOB_RECURSE RESTRUCTURED_FILES ${SPHINX_SOURCE}/*.rst)
 
 add_custom_target(Sphinx
     COMMAND ${SPHINX_EXECUTABLE} -b html -c ${SPHINX_CONF}
-    -D breathe_projects.CubicInterpolation=${DOXYGEN_OUTPUT_DIR}/xml
+    -D breathe_projects.CubicInterpolation="${DOXYGEN_OUTPUT_DIR}/xml/"
     ${SPHINX_SOURCE} ${SPHINX_BUILD}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS Doxygen ${RESTRUCTURED_FILES} ${SPHINX_CONF}

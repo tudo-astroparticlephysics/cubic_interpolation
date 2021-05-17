@@ -1,5 +1,5 @@
 Interpolant
 ===========
 
-.. doxygenclass:: Interpolant
+.. doxygenclass:: cubic_splines::Interpolant
     :members:
