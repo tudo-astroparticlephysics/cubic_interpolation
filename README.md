@@ -1,7 +1,7 @@
 # cubic_interpolation [![Build Status](https://api.travis-ci.com/MaxSac/cubic_interpolation.svg?branch=main)](https://travis-ci.com/github/MaxSac/cubic_interpolation)
 
 A leightweight interpolation library based on boost and eigen.
-It's provide the utilities to handle tables which are runtime intensive to build
+It provides the utilities to handle tables which are runtime intensive to build
 and reduces interpolation failures to axis transformation.
 
 If runtime intensive interpolation tables are created over several orders of magnitude,
@@ -31,7 +31,9 @@ auto inter = Interpolant<CubicSplines<double>>(std::move(def), TABLS_PATH, TABLE
 auto res = inter.evaluate(point);
 ```
 
-More information can be found in the documentation which could be build with the
+More information can be found in the documentation which can be build with the
 flag `BUILD_DOCUMENTATION` with a sphinx and a doxygen target. 
+
+For information about the installation process look at the [INSTALL.md](https://github.com/MaxSac/cubic_interpolation/blob/main/INSTALL.md)
 
 
