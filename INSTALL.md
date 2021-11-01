@@ -37,6 +37,7 @@ $ conan build ..
 If you do not want to use conan, you need to provide these dependencies:
 
 * [boost](https://www.boost.org/) (>1.72.0)
+
 * [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) (>3.3.9)
 
 If you have these dependencies installed, clone the repository and create a build directory:
