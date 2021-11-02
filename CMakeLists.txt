@@ -11,7 +11,7 @@ message(STATUS ${CMAKE_MODULE_PATH})
 
 set(CubicInterpolation_VERSION_MAJOR 0)
 set(CubicInterpolation_VERSION_MINOR 1)
-set(CubicInterpolation_VERSION_PATCH 3)
+set(CubicInterpolation_VERSION_PATCH 5)
 set(CubicInterpolation_VERSION ${CubicInterpolation_VERSION_MAJOR}.${CubicInterpolation_VERSION_MINOR}.${CubicInterpolation_VERSION_PATCH})
 
 set(CMAKE_CXX_STANDARD 14)
