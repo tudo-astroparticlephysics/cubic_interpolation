@@ -40,7 +40,7 @@ public:
 template <typename T>
 struct CubicSplines<T>::RuntimeData : public CubicSplines<T>::StorageData {
 
-  boost::math::interpolators::cardinal_cubic_b_spline<T> spline;
+  boost::math::cubic_b_spline<T> spline;
 
   RuntimeData() = default;
 
