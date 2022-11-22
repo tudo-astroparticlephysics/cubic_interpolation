@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 #include <boost/math/differentiation/finite_difference.hpp>
-#include <boost/math/interpolators/cardinal_cubic_b_spline.hpp>
+#include <boost/math/interpolators/cubic_b_spline.hpp>
 #include <boost/serialization/access.hpp>
 #include <cmath>
 #include <vector>
@@ -208,7 +208,7 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
       auto diff = [this, &def, &func, n1](unsigned int n) {
         return _prime(func, def.axis, n, n1)[0];
       };
-      auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>(
+      auto spline = boost::math::cubic_b_spline<T>(
           yi.data(), yi.size(), 0, 1, diff(0u), diff(n_rows - 1));
       for (auto row = 0; row < n_rows; ++row)
         data->dydx1(n1, row) = spline.prime(row);
@@ -222,7 +222,7 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
       auto diff = [this, &def, &func, n2](unsigned int n) {
         return _prime(func, def.axis, n2, n)[1];
       };
-      auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>(
+      auto spline = boost::math::cubic_b_spline<T>(
           yi.data(), yi.size(), 0, 1, diff(0u), diff(n_cols - 1));
       for (auto col = 0; col < n_cols; ++col)
         data->dydx2(col, n2) = spline.prime(col);
@@ -245,7 +245,7 @@ BicubicSplines<T>::BicubicSplines(Definition const &def)
       auto diff = [this, &def, &func, n2](unsigned int n) {
         return _double_prime(def, func, n2, n);
       };
-      auto spline = boost::math::interpolators::cardinal_cubic_b_spline<T>(
+      auto spline = boost::math::cubic_b_spline<T>(
           yi.data(), yi.size(), 0, 1, diff(0u), diff(n_cols - 1));
       for (auto col = 0; col < n_cols; ++col)
         data->d2ydx1dx2(col, n2) = spline.prime(col);
