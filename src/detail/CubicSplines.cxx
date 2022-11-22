@@ -98,9 +98,9 @@ template <typename T> T CubicSplines<T>::prime(T x) const {
   return data->spline.prime(x);
 };
 
-template <typename T> T CubicSplines<T>::double_prime(T x) const {
-  return data->spline.double_prime(x);
-};
+//template <typename T> T CubicSplines<T>::double_prime(T x) const {
+//  return data->spline.double_prime(x);
+//};
 } // namespace cubic_splines
 
 template class cubic_splines::CubicSplines<float>;

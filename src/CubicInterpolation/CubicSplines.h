@@ -50,7 +50,7 @@ public:
 
   T prime(T x) const;
 
-  T double_prime(T x) const;
+  //T double_prime(T x) const;
 };
 
 
