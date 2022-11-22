@@ -2,7 +2,7 @@
 #include "CubicInterpolation/InterpolantBuilder.h"
 
 #include <boost/math/differentiation/finite_difference.hpp>
-#include <boost/math/interpolators/cardinal_cubic_b_spline.hpp>
+#include <boost/math/interpolators/cubic_b_spline.hpp>
 #include <boost/serialization/access.hpp>
 #include <vector>
 
