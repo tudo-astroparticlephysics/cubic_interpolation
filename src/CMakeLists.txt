@@ -47,6 +47,12 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
     )
 
+# yes, we regenerate this file to take advantage of generator expressions
+file(GENERATE
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
+    INPUT  ${CMAKE_CURRENT_BINARY_DIR}/CubicInterpolationConfig.cmake
+)
+
 file(GLOB CMAKE_FILES "${CMAKE_BINARY_DIR}/*.cmake")
 install(FILES ${CMAKE_FILES} DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/CubicInterpolation)
